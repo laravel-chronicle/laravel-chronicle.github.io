@@ -22,9 +22,8 @@ const config: Config = {
 
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
-  organizationName: 'facebook', // Usually your GitHub org/user name.
-  projectName: 'laravel-chronicle', // Usually your repo name.
-  deploymentBranch: 'main',
+  organizationName: 'laravel-chronicle', // Usually your GitHub org/user name.
+  projectName: 'laravel-chronicle.github.io', // Usually your repo name.
   trailingSlash: false,
 
   onBrokenLinks: 'throw',
