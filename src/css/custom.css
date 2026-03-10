@@ -1,30 +1,141 @@
-/**
- * Any CSS included here will be global. The classic template
- * bundles Infima by default. Infima is a CSS framework designed to
- * work well for content-centric websites.
- */
-
-/* You can override the default Infima variables here. */
 :root {
-  --ifm-color-primary: #2e8555;
-  --ifm-color-primary-dark: #29784c;
-  --ifm-color-primary-darker: #277148;
-  --ifm-color-primary-darkest: #205d3b;
-  --ifm-color-primary-light: #33925d;
-  --ifm-color-primary-lighter: #359962;
-  --ifm-color-primary-lightest: #3cad6e;
-  --ifm-code-font-size: 95%;
-  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
+  --ifm-color-primary: #b25c2c;
+  --ifm-color-primary-dark: #985025;
+  --ifm-color-primary-darker: #8f4b23;
+  --ifm-color-primary-darkest: #763d1d;
+  --ifm-color-primary-light: #c26833;
+  --ifm-color-primary-lighter: #cb7442;
+  --ifm-color-primary-lightest: #da8f66;
+  --ifm-background-color: #fcfaf7;
+  --ifm-background-surface-color: #ffffff;
+  --ifm-font-family-base: "IBM Plex Sans", "Avenir Next", "Segoe UI", sans-serif;
+  --ifm-font-family-monospace: "IBM Plex Mono", "SFMono-Regular", "Menlo", monospace;
+  --ifm-heading-font-family: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", serif;
+  --ifm-code-font-size: 94%;
+  --ifm-navbar-background-color: rgba(252, 250, 247, 0.86);
+  --ifm-navbar-shadow: 0 1px 0 rgba(31, 42, 68, 0.08);
+  --ifm-footer-background-color: #1b2028;
+  --ifm-footer-color: rgba(255, 255, 255, 0.82);
+  --ifm-footer-link-color: rgba(255, 255, 255, 0.86);
+  --ifm-menu-color-active: var(--ifm-color-primary);
+  --ifm-toc-border-color: rgba(31, 42, 68, 0.1);
+  --ifm-global-radius: 20px;
+  --ifm-global-shadow-lw: 0 16px 36px rgba(24, 29, 36, 0.08);
+  --ifm-h1-font-size: 3rem;
+  --ifm-h2-font-size: 2.1rem;
+  --ifm-h3-font-size: 1.35rem;
+  --docusaurus-highlighted-code-line-bg: rgba(178, 92, 44, 0.12);
+  --chronicle-ink: #1f2a44;
+  --chronicle-ink-soft: #5d6678;
+  --chronicle-accent-strong: #b25c2c;
+  --chronicle-surface: rgba(255, 255, 255, 0.9);
+  --chronicle-border: rgba(31, 42, 68, 0.1);
+  --chronicle-shadow-soft: 0 18px 42px rgba(27, 32, 40, 0.08);
 }
 
-/* For readability concerns, you should choose a lighter palette in dark mode. */
 [data-theme='dark'] {
-  --ifm-color-primary: #25c2a0;
-  --ifm-color-primary-dark: #21af90;
-  --ifm-color-primary-darker: #1fa588;
-  --ifm-color-primary-darkest: #1a8870;
-  --ifm-color-primary-light: #29d5b0;
-  --ifm-color-primary-lighter: #32d8b4;
-  --ifm-color-primary-lightest: #4fddbf;
-  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+  --ifm-color-primary: #f1a97d;
+  --ifm-color-primary-dark: #ee9865;
+  --ifm-color-primary-darker: #ec8f59;
+  --ifm-color-primary-darkest: #e1732d;
+  --ifm-color-primary-light: #f4ba95;
+  --ifm-color-primary-lighter: #f6c3a1;
+  --ifm-color-primary-lightest: #faddcc;
+  --ifm-background-color: #12171d;
+  --ifm-background-surface-color: #161c24;
+  --ifm-navbar-background-color: rgba(18, 23, 29, 0.86);
+  --ifm-navbar-shadow: 0 1px 0 rgba(255, 255, 255, 0.06);
+  --ifm-footer-background-color: #0e1318;
+  --ifm-toc-border-color: rgba(255, 255, 255, 0.08);
+  --docusaurus-highlighted-code-line-bg: rgba(241, 169, 125, 0.15);
+  --chronicle-ink: #f5efe7;
+  --chronicle-ink-soft: #c0c7d1;
+  --chronicle-accent-strong: #f1a97d;
+  --chronicle-surface: rgba(22, 28, 36, 0.92);
+  --chronicle-border: rgba(255, 255, 255, 0.08);
+  --chronicle-shadow-soft: 0 18px 42px rgba(0, 0, 0, 0.24);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  color: var(--chronicle-ink);
+  background:
+    radial-gradient(circle at top left, rgba(215, 126, 72, 0.08), transparent 22%),
+    linear-gradient(180deg, var(--ifm-background-color), var(--ifm-background-color));
+}
+
+h1,
+h2,
+h3,
+h4 {
+  letter-spacing: -0.03em;
+}
+
+.navbar {
+  backdrop-filter: blur(18px);
+}
+
+.navbar__brand {
+  font-weight: 700;
+}
+
+.button {
+  border-radius: 999px;
+  font-weight: 700;
+}
+
+.button--primary {
+  box-shadow: 0 14px 28px rgba(178, 92, 44, 0.22);
+}
+
+.theme-doc-markdown header + p,
+.theme-doc-markdown > p {
+  color: var(--chronicle-ink-soft);
+}
+
+.theme-doc-markdown ul li,
+.theme-doc-markdown ol li {
+  margin: 0.35rem 0;
+}
+
+.theme-doc-markdown code,
+.theme-code-block code {
+  border-radius: 0.5rem;
+}
+
+.theme-doc-sidebar-menu .menu__link {
+  border-radius: 14px;
+}
+
+.theme-doc-sidebar-item-link-level-1 > .menu__link--active,
+.theme-doc-sidebar-item-category-level-1 > .menu__link--active {
+  font-weight: 700;
+}
+
+.pagination-nav__link {
+  border-radius: 20px;
+}
+
+.footer {
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+@media (max-width: 996px) {
+  .navbar {
+    backdrop-filter: none;
+  }
+
+  .navbar__inner > .navbar__items > .navbar__item,
+  .navbar__inner > .navbar__items--right > .navbar__item {
+    display: none;
+  }
+
+  .navbar-sidebar .navbar__item,
+  .navbar-sidebar .menu__link,
+  .navbar-sidebar .menu__caret {
+    display: inherit;
+  }
 }
