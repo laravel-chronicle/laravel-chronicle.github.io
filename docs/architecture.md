@@ -13,6 +13,8 @@ Developer API
 ↓
 Entry Builder
 ↓
+Extension Pipeline (VALIDATE → RESOLVE_CONTEXT → POLICY → PROCESS)
+↓
 Canonical Payload Serializer
 ↓
 Payload Hasher
@@ -28,10 +30,11 @@ Checkpoint / Verification / Export Tooling
 
 1. Application code starts an entry with `Chronicle::record()`
 2. `EntryBuilder` validates the required fields and assembles the payload
-3. The payload is canonicalized into deterministic JSON
-4. Chronicle computes a payload hash
-5. Chronicle computes the next chain hash from the previous chain head and the payload hash
-6. The active storage driver persists the immutable entry
+3. The extension pipeline runs — built-in validators reject invalid entries before anything is written
+4. The payload is canonicalized into deterministic JSON
+5. Chronicle computes a payload hash
+6. Chronicle computes the next chain hash from the previous chain head and the payload hash
+7. The active storage driver persists the immutable entry
 
 ## Main components
 

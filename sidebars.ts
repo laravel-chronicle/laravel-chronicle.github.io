@@ -24,6 +24,7 @@ const sidebars: SidebarsConfig = {
         'checkpoints',
         'diff-engine',
         'entry-extensions',
+        'validation',
         'storage-drivers',
         'exports',
       ],

@@ -102,15 +102,51 @@ Controls whether Chronicle should fail the application boot process if signing i
 
 This is useful in production once your key management is in place. It is skipped automatically in the `testing` environment.
 
-## `extensions`
+## `validation`
 
-Registers custom entry extensions that run before Chronicle's built-in pipeline stages.
+Controls the configurable limits enforced by Chronicle's built-in validators.
 
 ```php
-'extensions' => [],
+'validation' => [
+    'action_max_length'         => env('CHRONICLE_ACTION_MAX_LENGTH', 255),
+    'tag_max_length'            => env('CHRONICLE_TAG_MAX_LENGTH', 50),
+    'tag_limit'                 => env('CHRONICLE_TAG_LIMIT', 10),
+    'correlation_id_max_length' => env('CHRONICLE_CORRELATION_ID_MAX_LENGTH', 255),
+    'max_payload_size'          => env('CHRONICLE_MAX_PAYLOAD_SIZE', 65536),
+],
 ```
 
-Each extension must implement `Chronicle\Contracts\EntryExtension`. These are executed before canonicalization, payload hashing, chain hashing, and persistence, which makes them the right place for deterministic payload enrichment.
+| Key | Default | Description |
+|-----|---------|-------------|
+| `action_max_length` | `255` | Maximum byte length of the `action` string |
+| `tag_max_length` | `50` | Maximum UTF-8 character length of a single tag |
+| `tag_limit` | `10` | Maximum number of tags per entry |
+| `correlation_id_max_length` | `255` | Maximum UTF-8 character length of a `correlation_id` |
+| `max_payload_size` | `65536` | Maximum byte size of the combined serialized `metadata`, `context`, and `diff` (64 KB) |
+
+See [Validation](./validation) for a full description of each built-in validator.
+
+## `extensions`
+
+Registers entry extensions that run before Chronicle's built-in pipeline stages.
+
+```php
+'extensions' => [
+    ActorPresenceValidator::class,
+    SubjectValidator::class,
+    ActionValidator::class,
+    CorrelationValidator::class,
+    TagLimitValidator::class,
+    TagsValidator::class,
+    DiffStructureValidator::class,
+    PayloadSerializableValidator::class,
+    PayloadSizeValidator::class,
+],
+```
+
+The default set contains Chronicle's built-in validators. Each extension must implement `Chronicle\Contracts\EntryExtension`. Extensions are executed before canonicalization, payload hashing, chain hashing, and persistence.
+
+Remove a built-in validator from this array to disable it. Add your own classes to extend or replace validation logic.
 
 ## Example production-oriented config
 
@@ -129,6 +165,23 @@ return [
         'public_key' => env('CHRONICLE_PUBLIC_KEY'),
         'enforce_on_boot' => env('CHRONICLE_SIGNING_ENFORCE_ON_BOOT', true),
     ],
-    'extensions' => [],
+    'validation' => [
+        'action_max_length'         => env('CHRONICLE_ACTION_MAX_LENGTH', 255),
+        'tag_max_length'            => env('CHRONICLE_TAG_MAX_LENGTH', 50),
+        'tag_limit'                 => env('CHRONICLE_TAG_LIMIT', 10),
+        'correlation_id_max_length' => env('CHRONICLE_CORRELATION_ID_MAX_LENGTH', 255),
+        'max_payload_size'          => env('CHRONICLE_MAX_PAYLOAD_SIZE', 65536),
+    ],
+    'extensions' => [
+        \Chronicle\Validation\ActorPresenceValidator::class,
+        \Chronicle\Validation\SubjectValidator::class,
+        \Chronicle\Validation\ActionValidator::class,
+        \Chronicle\Validation\CorrelationValidator::class,
+        \Chronicle\Validation\TagLimitValidator::class,
+        \Chronicle\Validation\TagsValidator::class,
+        \Chronicle\Validation\DiffStructureValidator::class,
+        \Chronicle\Validation\PayloadSerializableValidator::class,
+        \Chronicle\Validation\PayloadSizeValidator::class,
+    ],
 ];
 ```
