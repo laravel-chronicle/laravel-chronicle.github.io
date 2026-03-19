@@ -26,6 +26,7 @@ const sidebars: SidebarsConfig = {
         'entry-extensions',
         'validation',
         'context-resolvers',
+        'policies',
         'storage-drivers',
         'exports',
       ],
