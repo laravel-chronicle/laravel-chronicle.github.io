@@ -25,6 +25,7 @@ const sidebars: SidebarsConfig = {
         'diff-engine',
         'entry-extensions',
         'validation',
+        'context-resolvers',
         'storage-drivers',
         'exports',
       ],
