@@ -17,9 +17,12 @@ Selects the storage driver Chronicle uses to persist entries.
 
 Built-in drivers:
 
-- `eloquent`: writes to the database through Laravel's database layer
+- `eloquent` / `database`: synchronous write via Laravel's database layer (default)
+- `queued`: asynchronous write via a dedicated queue worker
 - `array`: in-memory storage for tests
 - `null`: discards entries, useful for tests or local development
+
+See [Storage Drivers](./storage-drivers.md) for full details on each driver.
 
 ## `connection`
 
@@ -30,6 +33,46 @@ Controls which Laravel database connection Chronicle uses for its tables.
 ```
 
 Set this when you want the audit ledger isolated from your main application database.
+
+## `queue`
+
+Used when `driver = 'queued'`. Chronicle chain hashes are order-sensitive, so this queue **must** be processed by a single worker:
+
+```bash
+php artisan queue:work --queue=chronicle --tries=1
+```
+
+Running multiple workers on this queue will produce chain forks.
+
+```php
+'queue' => [
+    'connection' => env('CHRONICLE_QUEUE_CONNECTION'),
+    'name'       => env('CHRONICLE_QUEUE', 'chronicle'),
+],
+```
+
+| Key | Env var | Default | Description |
+|-----|---------|---------|-------------|
+| `connection` | `CHRONICLE_QUEUE_CONNECTION` | `null` (default queue connection) | Laravel queue connection to use |
+| `name` | `CHRONICLE_QUEUE` | `chronicle` | Queue name for Chronicle jobs |
+
+## `prune`
+
+Used by `chronicle:prune`. Controls how old entries are retained.
+
+```php
+'prune' => [
+    'default_retention_days' => env('CHRONICLE_RETENTION_DAYS'),
+    'respect_checkpoints'    => true,
+],
+```
+
+| Key | Default | Description |
+|-----|---------|-------------|
+| `default_retention_days` | `null` (disabled) | Entries older than this many days are eligible for pruning |
+| `respect_checkpoints` | `true` | Entries anchored to a checkpoint are protected unless `--force` is passed |
+
+Set `default_retention_days` to `null` to disable time-based pruning entirely.
 
 ## `tables.entries`
 
@@ -147,6 +190,36 @@ Registers entry extensions that run before Chronicle's built-in pipeline stages.
 The default set contains Chronicle's built-in validators. Each extension must implement `Chronicle\Contracts\EntryExtension`. Extensions are executed before canonicalization, payload hashing, chain hashing, and persistence.
 
 Remove a built-in validator from this array to disable it. Add your own classes to extend or replace validation logic.
+
+## `ui`
+
+Chronicle ships an optional read-only Blade interface. It is disabled by default.
+
+```php
+'ui' => [
+    'enabled'    => env('CHRONICLE_UI_ENABLED', false),
+    'prefix'     => env('CHRONICLE_UI_PREFIX', 'chronicle'),
+    'middleware' => ['web', 'auth', 'can:view-chronicle'],
+    'per_page'   => env('CHRONICLE_UI_PER_PAGE', 25),
+],
+```
+
+| Key | Env var | Default | Description |
+|-----|---------|---------|-------------|
+| `enabled` | `CHRONICLE_UI_ENABLED` | `false` | Set to `true` to activate the web interface |
+| `prefix` | `CHRONICLE_UI_PREFIX` | `chronicle` | URL prefix for UI routes |
+| `middleware` | *(PHP array, no env var)* | `['web','auth','can:view-chronicle']` | Middleware stack applied to all UI routes |
+| `per_page` | `CHRONICLE_UI_PER_PAGE` | `25` | Entries shown per page on the index |
+
+The `can:view-chronicle` gate must be defined in your `AuthServiceProvider`:
+
+```php
+Gate::define('view-chronicle', fn ($user) => $user->isAdmin());
+```
+
+To allow any authenticated user, set `middleware` to `['web', 'auth']`.
+
+Note: `middleware` is a plain PHP array and cannot be driven by an environment variable — arbitrary middleware class names require code-level configuration.
 
 ## Example production-oriented config
 
