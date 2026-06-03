@@ -93,6 +93,23 @@ const config: Config = {
             },
           ],
         },
+        {
+          title: 'Project',
+          items: [
+            {
+              label: 'Changelog',
+              href: 'https://github.com/laravel-chronicle/core/blob/main/CHANGELOG.md',
+            },
+            {
+              label: 'Contributing',
+              href: 'https://github.com/laravel-chronicle/core/blob/main/CONTRIBUTING.md',
+            },
+            {
+              label: 'Security Policy',
+              href: 'https://github.com/laravel-chronicle/core/blob/main/SECURITY.md',
+            },
+          ],
+        },
       ],
       copyright: `Copyright © ${new Date().getFullYear()} Laravel Chronicle. Built with Docusaurus.`,
     },
