@@ -77,7 +77,7 @@ Entries created inside the transaction share a generated correlation root so you
 Use the model scopes directly when you want Eloquent-level control:
 
 ```php
-use Chronicle\Models\Entry;
+use Chronicle\Entry\Entry;
 
 $recentOrderEvents = Entry::query()
     ->forSubject($order)

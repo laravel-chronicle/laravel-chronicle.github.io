@@ -33,7 +33,7 @@ Set this when you want the audit ledger isolated from your main application data
 
 ## `tables.entries`
 
-Overrides the table used by `Chronicle\Models\Entry`.
+Overrides the table used by `Chronicle\Entry\Entry`.
 
 ```php
 'tables' => [

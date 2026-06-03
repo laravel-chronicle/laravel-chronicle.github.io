@@ -6,7 +6,7 @@ title: Query API Documentation
 
 Chronicle exposes two read surfaces:
 
-- model scopes on `Chronicle\Models\Entry`
+- model scopes on `Chronicle\Entry\Entry`
 - a reader service available through `Chronicle::reader()`
 
 Use the model when you want full Eloquent composition. Use the reader when you want a small, package-level API for common ledger reads.
@@ -16,7 +16,7 @@ Use the model when you want full Eloquent composition. Use the reader when you w
 Import the entry model:
 
 ```php
-use Chronicle\Models\Entry;
+use Chronicle\Entry\Entry;
 ```
 
 ## `forActor(Model $actor)`
