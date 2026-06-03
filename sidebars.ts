@@ -20,6 +20,8 @@ const sidebars: SidebarsConfig = {
       type: 'category',
       label: 'Guides',
       items: [
+        'recording-entries',
+        'auditing-eloquent-models',
         'transactions',
         'checkpoints',
         'diff-engine',
@@ -35,10 +37,13 @@ const sidebars: SidebarsConfig = {
       type: 'category',
       label: 'Reference',
       items: [
+        'artisan-commands',
         'query-api',
         'reference-resolution',
         'config-reference',
         'export-format',
+        'events',
+        'testing-helpers',
       ],
     },
     {
@@ -49,6 +54,9 @@ const sidebars: SidebarsConfig = {
         'export-verification',
         'signing-and-keys',
         'performance-and-indexing',
+        'pruning',
+        'compliance-reports',
+        'web-ui',
       ],
     },
   ],
