@@ -205,4 +205,4 @@ $auditTrail = Chronicle::reader()->correlation($correlationId);
 - Use streaming for exports, verification helpers, and batch analysis
 - Use `withTags()` carefully on very large PostgreSQL datasets unless you add JSON-specific indexes
 
-For PostgreSQL-specific indexing strategies, see [PostgreSQL JSON Index Documentation](./postgresql-json-indexes.md).
+For PostgreSQL-specific indexing strategies, see [Performance & Indexing](./performance-and-indexing.md).

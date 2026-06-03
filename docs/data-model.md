@@ -108,4 +108,4 @@ Chronicle’s migrations add indexes for:
 - `correlation_id`
 - `created_at`
 
-For PostgreSQL-specific tag indexing, see [PostgreSQL JSON Index Documentation](./postgresql-json-indexes.md).
+For PostgreSQL-specific tag indexing, see [Performance & Indexing](./performance-and-indexing.md).

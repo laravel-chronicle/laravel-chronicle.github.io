@@ -48,7 +48,7 @@ const sidebars: SidebarsConfig = {
         'integrity-verification',
         'export-verification',
         'signing-and-keys',
-        'postgresql-json-indexes',
+        'performance-and-indexing',
       ],
     },
   ],
