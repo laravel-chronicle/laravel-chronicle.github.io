@@ -126,9 +126,17 @@
 .codeBlock {
   margin: 0;
   overflow-x: auto;
+  background: transparent;
   color: #f4f0e8;
   font-size: 0.95rem;
   line-height: 1.7;
+}
+
+.codeBlock code {
+  background: transparent;
+  color: inherit;
+  padding: 0;
+  font-size: inherit;
 }
 
 .main {
