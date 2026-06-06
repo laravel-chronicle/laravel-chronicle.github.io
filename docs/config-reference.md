@@ -93,57 +93,54 @@ Overrides the table used for signed checkpoints.
 
 This table stores the checkpoint chain head, entry count, signature metadata, and creation timestamp used to anchor the ledger state at a known moment in time.
 
-## `signing.provider`
+## `signing.active`
 
-Defines the signing provider class.
+The key ID used to sign new checkpoints and exports. Must match a key defined in `signing.keys`.
 
 ```php
 'signing' => [
-    'provider' => \Chronicle\Signing\Ed25519SigningProvider::class,
+    'active' => env('CHRONICLE_ACTIVE_KEY', 'chronicle-dev-key'),
 ],
 ```
 
-Custom providers must implement `Chronicle\Contracts\SigningProvider`.
-
-## `signing.key_id`
-
-An identifier written alongside checkpoint and export signatures.
-
-```php
-'key_id' => env('CHRONICLE_KEY_ID', 'chronicle-dev-key'),
-```
-
-Use a stable, descriptive value so external verifiers can map signatures to the correct public key.
-
-## `signing.private_key`
-
-The base64-encoded private key used to sign checkpoints and exports.
-
-```php
-'private_key' => env('CHRONICLE_PRIVATE_KEY'),
-```
-
-With the default Ed25519 provider this must decode to 64 bytes.
-
-## `signing.public_key`
-
-The base64-encoded public key used to verify signatures.
-
-```php
-'public_key' => env('CHRONICLE_PUBLIC_KEY'),
-```
-
-With the default Ed25519 provider this must decode to 32 bytes.
-
 ## `signing.enforce_on_boot`
 
-Controls whether Chronicle should fail the application boot process if signing is misconfigured.
+When `true`, Chronicle throws a `RuntimeException` at boot if the active key is missing or misconfigured. Only the active key is validated — retired verify-only keys in the ring are not checked.
 
 ```php
 'enforce_on_boot' => env('CHRONICLE_SIGNING_ENFORCE_ON_BOOT', false),
 ```
 
-This is useful in production once your key management is in place. It is skipped automatically in the `testing` environment.
+Silenced automatically in the `testing` environment.
+
+## `signing.keys`
+
+The full key ring. Each entry is a named key with its provider class, algorithm, and key material.
+
+```php
+'signing' => [
+    'active' => env('CHRONICLE_ACTIVE_KEY', 'chronicle-dev-key'),
+    'keys' => [
+        'chronicle-dev-key' => [
+            'provider'    => \Chronicle\Signing\Ed25519SigningProvider::class,
+            'algorithm'   => 'ed25519',
+            'private_key' => env('CHRONICLE_PRIVATE_KEY'),
+            'public_key'  => env('CHRONICLE_PUBLIC_KEY'),
+        ],
+    ],
+],
+```
+
+| Key entry field | Description |
+|---|---|
+| `provider` | Class implementing `Chronicle\Contracts\SigningProvider`. |
+| `algorithm` | Stable identifier stored in artifacts (e.g. `'ed25519'`, `'ecdsa-p256'`). |
+| `private_key` | Signing key material. Omit or set to `null` to create a verify-only retired key. |
+| `public_key` | Verification key material. Required for all keys including retired ones. |
+
+Retired keys (keys without `private_key`) must remain in `signing.keys` permanently so that historic checkpoints and exports can continue to be verified.
+
+See [Signing & Keys](./signing-and-keys.md) for the full key ring documentation and rotation workflow.
 
 ## `validation`
 
@@ -225,18 +222,23 @@ Note: `middleware` is a plain PHP array and cannot be driven by an environment v
 
 ```php
 return [
-    'driver' => env('CHRONICLE_DRIVER', 'eloquent'),
+    'driver'     => env('CHRONICLE_DRIVER', 'eloquent'),
     'connection' => env('CHRONICLE_DB_CONNECTION', 'audit'),
     'tables' => [
-        'entries' => 'chronicle_entries',
+        'entries'     => 'chronicle_entries',
         'checkpoints' => 'chronicle_checkpoints',
     ],
     'signing' => [
-        'provider' => \Chronicle\Signing\Ed25519SigningProvider::class,
-        'key_id' => env('CHRONICLE_KEY_ID', 'chronicle-main'),
-        'private_key' => env('CHRONICLE_PRIVATE_KEY'),
-        'public_key' => env('CHRONICLE_PUBLIC_KEY'),
         'enforce_on_boot' => env('CHRONICLE_SIGNING_ENFORCE_ON_BOOT', true),
+        'active'          => env('CHRONICLE_ACTIVE_KEY', 'main'),
+        'keys' => [
+            'main' => [
+                'provider'    => \Chronicle\Signing\Ed25519SigningProvider::class,
+                'algorithm'   => 'ed25519',
+                'private_key' => env('CHRONICLE_PRIVATE_KEY'),
+                'public_key'  => env('CHRONICLE_PUBLIC_KEY'),
+            ],
+        ],
     ],
     'validation' => [
         'action_max_length'         => env('CHRONICLE_ACTION_MAX_LENGTH', 255),
