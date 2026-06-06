@@ -4,13 +4,9 @@ title: Rotate Signing Keys
 
 # Rotate Signing Keys
 
-Replace the Ed25519 signing key without losing the ability to verify existing checkpoints and exports created under the old key.
+Replace the active signing key without losing the ability to verify existing checkpoints and exports created under the old key.
 
 ## Before you start
-
-Chronicle verification uses the **active** provider — it does not resolve historical keys by `key_id`. Any checkpoint or export artifact created under the old key must be re-verified (or archived with a note) before you retire that key.
-
-## 1. Verify the current ledger
 
 Confirm the ledger is clean before rotating:
 
@@ -18,64 +14,104 @@ Confirm the ledger is clean before rotating:
 php artisan chronicle:verify
 ```
 
-Fix any failures before continuing.
+Fix any failures before continuing. Rotation on a broken chain will not repair it.
 
-## 2. Create a checkpoint with the old key
-
-Anchor the chain head under the current key so you have a signed reference to the state immediately before rotation:
+## 1. Generate the new keypair
 
 ```bash
-php artisan chronicle:checkpoint
+php artisan chronicle:key:generate --id=my-key-2026
 ```
 
-Note the checkpoint id in the output — record it externally alongside the current `CHRONICLE_PUBLIC_KEY` if you need to verify that artifact later.
+The command prints a base64-encoded private key, a public key, and a ready-to-paste `signing.keys` config entry. Store the private key in your secret manager immediately — it is not saved anywhere by the command.
 
-## 3. Generate a new keypair
+## 2. Add the new key to `signing.keys` (without activating it)
+
+Copy the printed entry into `config/chronicle.php`. Keep the old key exactly as-is — do not remove it yet:
+
+```php
+'signing' => [
+    'active' => env('CHRONICLE_ACTIVE_KEY', 'chronicle-dev-key'),
+    'keys' => [
+        // Existing key stays unchanged
+        'chronicle-dev-key' => [
+            'provider'    => \Chronicle\Signing\Ed25519SigningProvider::class,
+            'algorithm'   => 'ed25519',
+            'private_key' => env('CHRONICLE_PRIVATE_KEY'),
+            'public_key'  => env('CHRONICLE_PUBLIC_KEY'),
+        ],
+        // New key added — not yet active
+        'my-key-2026' => [
+            'provider'    => \Chronicle\Signing\Ed25519SigningProvider::class,
+            'algorithm'   => 'ed25519',
+            'private_key' => env('CHRONICLE_NEW_PRIVATE_KEY'),
+            'public_key'  => env('CHRONICLE_NEW_PUBLIC_KEY'),
+        ],
+    ],
+],
+```
+
+Set `CHRONICLE_NEW_PRIVATE_KEY` and `CHRONICLE_NEW_PUBLIC_KEY` in your secrets manager and deploy this config change. The active key has not changed — this deploy is safe.
+
+## 3. Create the boundary checkpoint and get the activation instruction
 
 ```bash
-php -r '
-$kp = sodium_crypto_sign_keypair();
-echo "CHRONICLE_PRIVATE_KEY=" . base64_encode(sodium_crypto_sign_secretkey($kp)) . PHP_EOL;
-echo "CHRONICLE_PUBLIC_KEY="  . base64_encode(sodium_crypto_sign_publickey($kp))  . PHP_EOL;
-'
+php artisan chronicle:key:rotate my-key-2026
 ```
 
-Store the output securely — do not commit it to source control.
+Output:
 
-## 4. Update the environment variables
+```
+Creating boundary checkpoint before rotation...
+✓ Boundary checkpoint created
+  ID:        01JXX...
+  Algorithm: ed25519
+  Key:       chronicle-dev-key
 
-In your secrets manager or `.env`:
+Rotation ready. To activate my-key-2026, update your environment:
 
-```env
-CHRONICLE_KEY_ID=chronicle-main-v2
-CHRONICLE_PRIVATE_KEY=<new private key>
-CHRONICLE_PUBLIC_KEY=<new public key>
+  CHRONICLE_ACTIVE_KEY=my-key-2026
+
+After deploying the updated environment:
+  php artisan chronicle:key:list
+  php artisan chronicle:verify
 ```
 
-Update `CHRONICLE_KEY_ID` so future artifacts are distinguishable from those signed by the old key.
+The checkpoint anchors the current ledger head under the old key. All future checkpoints and exports will be signed by `my-key-2026`.
 
-## 5. Deploy and verify
+## 4. Activate the new key
 
-After deploying:
+Set `CHRONICLE_ACTIVE_KEY=my-key-2026` in your secrets manager and deploy.
+
+## 5. Verify the full ledger
 
 ```bash
-# Confirm Chronicle is using the new key
-php artisan chronicle:checkpoint
-
-# Verify the chain from the new key forward
 php artisan chronicle:verify
+php artisan chronicle:key:list
 ```
 
-## Verify it worked
+The full ledger — including checkpoints created before rotation under `chronicle-dev-key` — should verify cleanly because the old public key is still in the ring.
 
-```bash
-php artisan chronicle:stats
+## 6. Retire the old private key
+
+Once you have confirmed integrity, remove `private_key` from the old key's config entry:
+
+```php
+// Retired — private key removed, public key retained for historic verification
+'chronicle-dev-key' => [
+    'provider'   => \Chronicle\Signing\Ed25519SigningProvider::class,
+    'algorithm'  => 'ed25519',
+    'public_key' => env('CHRONICLE_OLD_PUBLIC_KEY'),
+    // no private_key
+],
 ```
 
-A new checkpoint should appear with the updated `key_id`. Any export produced after this point will carry the new key id in `signature.json`.
+:::warning
+**Keep `public_key` in the ring forever.** Removing it makes any artifact signed by that key permanently unverifiable.
+:::
 
 ## See also
 
-- [Signing & Keys](./signing-and-keys.md) — key format, generation, and the default Ed25519 provider
-- [Checkpoints](./checkpoints.md) — what a checkpoint stores
-- [Custom Signing Providers](./custom-signing-providers.md) — using KMS or other backends
+- [Signing & Keys](./signing-and-keys.md) — key ring config and verification behaviour
+- [Artisan Commands](./artisan-commands.md) — full `chronicle:key:*` reference
+- [Checkpoints](./checkpoints.md) — what the boundary checkpoint stores
+- [Security Model](./security-model.md) — what rotation does and does not guarantee
