@@ -4,7 +4,7 @@ title: Artisan Commands
 
 # Artisan Commands
 
-Chronicle ships nine Artisan commands. All signatures below are verified against `src/Console/Commands/`.
+Chronicle ships twelve Artisan commands. All signatures below are verified against `src/Console/Commands/`.
 
 ## Quick reference
 
@@ -19,6 +19,9 @@ Chronicle ships nine Artisan commands. All signatures below are verified against
 | `chronicle:show {id}` | Display a single entry |
 | `chronicle:prune` | Delete old entries by retention policy |
 | `chronicle:report {path}` | Generate a signed compliance report |
+| `chronicle:key:generate` | Generate an Ed25519 keypair |
+| `chronicle:key:list` | List all keys in the signing key ring |
+| `chronicle:key:rotate {newKeyId}` | Create a boundary checkpoint and print the activation instruction |
 
 ---
 
@@ -157,3 +160,61 @@ Generates a signed HTML compliance report.
 | `--to=` | End of reporting period (Y-m-d or ISO 8601) |
 
 See [Compliance Reports](./compliance-reports.md) for full details.
+
+---
+
+## `chronicle:key:generate`
+
+```bash
+php artisan chronicle:key:generate [--id=<keyId>]
+```
+
+Generates an Ed25519 keypair and prints the base64-encoded private and public keys alongside a ready-to-paste `signing.keys` config entry. The private key is never written to disk or any environment file.
+
+| Option | Description |
+|---|---|
+| `--id=` | Key ID to use in the config snippet. Defaults to `chronicle-key-YYYYMMDD` if omitted. |
+
+The command reminds you to store the private key in a secret manager (AWS Secrets Manager, HashiCorp Vault, 1Password, etc.).
+
+---
+
+## `chronicle:key:list`
+
+```bash
+php artisan chronicle:key:list [--with-counts]
+```
+
+Lists all keys configured in `signing.keys` with their ID, algorithm, provider, and status.
+
+| Status | Meaning |
+|---|---|
+| `● ACTIVE` | This key is referenced by `signing.active` and used to sign new artifacts. |
+| `verify-only` | No `private_key` configured. Can verify old artifacts; cannot sign new ones. |
+| `inactive` | Has signing material but is not the active key. |
+
+| Option | Description |
+|---|---|
+| `--with-counts` | Add a `Checkpoints` column showing the number of checkpoints signed by each key. |
+
+---
+
+## `chronicle:key:rotate`
+
+```bash
+php artisan chronicle:key:rotate {newKeyId}
+```
+
+Validates the target key, creates a mandatory boundary checkpoint signed by the current active key, then prints the `CHRONICLE_ACTIVE_KEY` instruction needed to complete the rotation.
+
+| Argument | Description |
+|---|---|
+| `newKeyId` | ID of the key to rotate to. Must exist in `signing.keys` and have signing material. |
+
+The command refuses with an actionable error if:
+- `newKeyId` is not present in `signing.keys`
+- `newKeyId` is already the active key
+- `newKeyId` has no `private_key` or `key_arn` (verify-only)
+- The ledger is empty (nothing to checkpoint)
+
+See [Signing & Keys](./signing-and-keys.md) for the full rotation workflow.
