@@ -49,6 +49,56 @@ If these keys are absent, Chronicle falls back to defaults — but you will not 
 
 ---
 
+## Upgrading to 1.11
+
+1.11 is additive. A 1.10 ledger with anchoring disabled and no incremental flags verifies **identically** to 1.10 — no artifact format change, and no re-export is needed.
+
+### 1. Run the migration
+
+1.11 adds range columns to the checkpoints table (`head_id`, `entry_count`, `previous_checkpoint_id`), an index on the existing `checkpoint_id` entries column (the foreign key does not create one on all database drivers), and two new tables (`chronicle_checkpoint_anchors`, `chronicle_verification_runs`):
+
+```bash
+php artisan chronicle:install --force   # re-publish config + migrations (only if you previously published them)
+php artisan migrate
+```
+
+If you never published the migrations, they load from the package automatically — just run `php artisan migrate`.
+
+### 2. Backfill historical checkpoints
+
+New checkpoints populate the range columns and `checkpoint_id` automatically. Backfill checkpoints created under 1.10 once — it is chunked and idempotent:
+
+```bash
+php artisan chronicle:checkpoints:backfill --dry-run   # preview
+php artisan chronicle:checkpoints:backfill
+```
+
+Until a ledger is backfilled, the incremental verification modes fall back to a full verify with a warning.
+
+### 3. checkpoint_id is now populated on creation
+
+1.10 left `checkpoint_id` unpopulated; 1.11 stamps it onto the entries a checkpoint covers at creation time (and the backfill does the same for history). **`checkpoint_id` is not part of any hashed payload** — populating it does not change any `payload_hash` or `chain_hash`, so existing signatures and exports remain valid.
+
+### 4. Anchoring is opt-in
+
+External anchoring is off unless you set `anchoring.enabled` (`CHRONICLE_ANCHORING_ENABLED=true`) and configure a provider. With it off, behaviour is unchanged. See [External Anchoring](./anchoring.md).
+
+### New config keys
+
+Add an `anchoring` block and the two new table keys to a previously-published `config/chronicle.php` (full details in the [Config Reference](./config-reference.md#anchoring)):
+
+```php
+'anchoring' => [
+    'enabled' => env('CHRONICLE_ANCHORING_ENABLED', false),
+    'queue' => env('CHRONICLE_ANCHORING_QUEUE'),
+    'providers' => [
+        // 'rfc3161' => [ /* see Config Reference */ ],
+    ],
+],
+```
+
+---
+
 ## Deprecations
 
 ### `EntryBuilder::modelChanges()` → `modelDiff()`
