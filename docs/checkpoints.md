@@ -17,12 +17,13 @@ Each checkpoint records:
 - `key_id`
 - `metadata`
 - `created_at`
+- `head_id`, `entry_count`, `previous_checkpoint_id` *(v1.11 — make the checkpoint chain walkable for [scalable verification](./scalable-verification.md))*
 
 ## Why checkpoints exist
 
 The hash chain protects entry-to-entry integrity, but a checkpoint gives you a signed anchor for the current chain head.
 
-That matters because without external anchors, an attacker with enough control could theoretically rewrite the entire ledger and produce a fresh internal chain. A checkpoint provides a signed state you can compare against later.
+That matters because without external anchors, an attacker with enough control could theoretically rewrite the entire ledger and produce a fresh internal chain. A checkpoint provides a signed state you can compare against later — and [external anchoring](./anchoring.md) (v1.11) copies that signed state out of the database entirely, so even a full rewrite is caught by `chronicle:verify --anchors`.
 
 ## Creating a checkpoint
 
@@ -58,7 +59,8 @@ This checks the chain and entry integrity, and checkpoint signatures are part of
 ## Operational advice
 
 - create checkpoints on a regular schedule
-- record checkpoint ids or chain heads in external systems when possible
+- record checkpoint ids or chain heads in external systems when possible — or enable [external anchoring](./anchoring.md), or run `chronicle:checkpoint --anchor`
 - treat the signing key used for checkpoints as security-sensitive infrastructure
+- use the [scalable verification](./scalable-verification.md) modes to keep verification cheap as the ledger grows
 
 Checkpoints are most useful when they become part of a wider operational evidence trail instead of remaining only inside the same database they protect.

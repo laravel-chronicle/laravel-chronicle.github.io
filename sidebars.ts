@@ -56,7 +56,9 @@ const sidebars: SidebarsConfig = {
       label: 'Verification & Integrity',
       items: [
         'integrity-verification',
+        'scalable-verification',
         'checkpoints',
+        'anchoring',
         'signing-and-keys',
       ],
     },

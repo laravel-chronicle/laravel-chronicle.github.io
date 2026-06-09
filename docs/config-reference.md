@@ -82,6 +82,8 @@ Overrides the table used by `Chronicle\Entry\Entry`.
 'tables' => [
     'entries' => env('CHRONICLE_TABLE_ENTRIES', 'chronicle_entries'),
     'checkpoints' => env('CHRONICLE_TABLE_CHECKPOINTS', 'chronicle_checkpoints'),
+    'checkpoint_anchors' => env('CHRONICLE_TABLE_CHECKPOINT_ANCHORS', 'chronicle_checkpoint_anchors'),
+    'verification_runs' => env('CHRONICLE_TABLE_VERIFICATION_RUNS', 'chronicle_verification_runs'),
 ],
 ```
 
@@ -141,6 +143,32 @@ The full key ring. Each entry is a named key with its provider class, algorithm,
 Retired keys (keys without `private_key`) must remain in `signing.keys` permanently so that historic checkpoints and exports can continue to be verified.
 
 See [Signing & Keys](./signing-and-keys.md) for the full key ring documentation and rotation workflow.
+
+## `anchoring`
+
+External anchoring of checkpoints. Opt-in; off by default. See [External Anchoring](./anchoring.md).
+
+```php
+'anchoring' => [
+    'enabled' => env('CHRONICLE_ANCHORING_ENABLED', false),
+    'queue' => env('CHRONICLE_ANCHORING_QUEUE'),
+    'providers' => [
+        // 'rfc3161' => [
+        //     'provider' => \Chronicle\Anchoring\Rfc3161TimestampAnchor::class,
+        //     'tsa_url' => env('CHRONICLE_TSA_URL'),
+        //     'tsa_certificate' => env('CHRONICLE_TSA_CERTIFICATE'),
+        // ],
+    ],
+],
+```
+
+| Key | Env | Default | Meaning |
+|---|---|---|---|
+| `anchoring.enabled` | `CHRONICLE_ANCHORING_ENABLED` | `false` | Anchor each new checkpoint after commit |
+| `anchoring.queue` | `CHRONICLE_ANCHORING_QUEUE` | `null` | Queue for the anchoring job (null = default) |
+| `anchoring.providers` | — | `[]` | `name => ['provider' => class, ...config]` |
+
+When `enabled`, each new checkpoint is anchored asynchronously with every configured provider after the checkpoint transaction commits. An anchor failure never rolls a checkpoint back.
 
 ## `validation`
 
@@ -225,8 +253,10 @@ return [
     'driver'     => env('CHRONICLE_DRIVER', 'eloquent'),
     'connection' => env('CHRONICLE_DB_CONNECTION', 'audit'),
     'tables' => [
-        'entries'     => 'chronicle_entries',
-        'checkpoints' => 'chronicle_checkpoints',
+        'entries'            => 'chronicle_entries',
+        'checkpoints'        => 'chronicle_checkpoints',
+        'checkpoint_anchors' => 'chronicle_checkpoint_anchors',
+        'verification_runs'  => 'chronicle_verification_runs',
     ],
     'signing' => [
         'enforce_on_boot' => env('CHRONICLE_SIGNING_ENFORCE_ON_BOOT', true),
@@ -238,6 +268,17 @@ return [
                 'private_key' => env('CHRONICLE_PRIVATE_KEY'),
                 'public_key'  => env('CHRONICLE_PUBLIC_KEY'),
             ],
+        ],
+    ],
+    'anchoring' => [
+        'enabled'   => env('CHRONICLE_ANCHORING_ENABLED', false),
+        'queue'     => env('CHRONICLE_ANCHORING_QUEUE'),
+        'providers' => [
+            // 'rfc3161' => [
+            //     'provider'        => \Chronicle\Anchoring\Rfc3161TimestampAnchor::class,
+            //     'tsa_url'         => env('CHRONICLE_TSA_URL'),
+            //     'tsa_certificate' => env('CHRONICLE_TSA_CERTIFICATE'),
+            // ],
         ],
     ],
     'validation' => [

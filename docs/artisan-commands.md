@@ -4,7 +4,7 @@ title: Artisan Commands
 
 # Artisan Commands
 
-Chronicle ships twelve Artisan commands. All signatures below are verified against `src/Console/Commands/`.
+Chronicle ships fifteen Artisan commands. All signatures below are verified against `src/Console/Commands/`.
 
 ## Quick reference
 
@@ -22,6 +22,9 @@ Chronicle ships twelve Artisan commands. All signatures below are verified again
 | `chronicle:key:generate` | Generate an Ed25519 keypair |
 | `chronicle:key:list` | List all keys in the signing key ring |
 | `chronicle:key:rotate {newKeyId}` | Create a boundary checkpoint and print the activation instruction |
+| `chronicle:checkpoints:backfill` | Backfill v1.11 range columns + `checkpoint_id` for pre-1.11 data |
+| `chronicle:anchor:retry` | Re-attempt outstanding checkpoint anchors |
+| `chronicle:anchor:verify` | Verify stored checkpoint anchors against their providers |
 
 ---
 
@@ -43,10 +46,14 @@ Publishes `config/chronicle.php` and the Chronicle migrations.
 ## `chronicle:checkpoint`
 
 ```bash
-php artisan chronicle:checkpoint
+php artisan chronicle:checkpoint [--anchor]
 ```
 
 Creates a signed checkpoint anchoring the current ledger chain head. Chronicle reuses an existing checkpoint if one already exists for the same chain hash.
+
+| Option | Description |
+|---|---|
+| `--anchor` | Also anchor the new checkpoint **synchronously** with every configured provider (see [External Anchoring](./anchoring.md)) |
 
 Requires signing keys to be configured. Cannot be run against an empty ledger.
 
@@ -71,16 +78,24 @@ The directory is created if it does not exist. See [Exports](./exports.md) for o
 ## `chronicle:verify`
 
 ```bash
-php artisan chronicle:verify [--entry=<ULID>]
+php artisan chronicle:verify [--entry=<ULID>] [--checkpoints-only] \
+  [--from-checkpoint=<ULID>] [--to-checkpoint=<ULID>] \
+  [--since-last-checkpoint] [--anchors] [--resume]
 ```
 
-**Without `--entry`:** verifies the full ledger — payload hashes, chain hashes, and dataset boundaries.
-
-**With `--entry=<ULID>`:** verifies a single entry's payload hash and chain hash in isolation.
+Verifies ledger integrity. With no flags it verifies the full ledger from genesis. The other flags select cheaper, scoped passes — see [Scalable Verification](./scalable-verification.md) for when to use each and its cost.
 
 | Option | Description |
 |---|---|
-| `--entry=` | ULID of a single entry to verify; omit to verify the full ledger |
+| `--entry=<ULID>` | Verify a single entry's payload and chain hash in isolation |
+| `--checkpoints-only` | Verify only the checkpoint chain — `O(checkpoints)`, reads no entries |
+| `--from-checkpoint=<ULID>` | Verify the segment seeded from this checkpoint |
+| `--to-checkpoint=<ULID>` | With `--from-checkpoint`, the checkpoint that ends the segment (default: current head) |
+| `--since-last-checkpoint` | Trust the latest checkpoint and verify only the trail after it |
+| `--anchors` | Additionally verify external anchors for the checkpoints in scope |
+| `--resume` | Continue from the last recorded verification run (full verify if none) |
+
+The incremental modes require checkpoints backfilled with the v1.11 range columns; until then they fall back to a full verify with a warning.
 
 ---
 
@@ -218,3 +233,48 @@ The command refuses with an actionable error if:
 - The ledger is empty (nothing to checkpoint)
 
 See [Signing & Keys](./signing-and-keys.md) for the full rotation workflow.
+
+---
+
+## `chronicle:checkpoints:backfill`
+
+```bash
+php artisan chronicle:checkpoints:backfill [--chunk=1000] [--dry-run]
+```
+
+Populates the v1.11 range columns (`head_id`, `entry_count`, `previous_checkpoint_id`) and stamps `checkpoint_id` onto covered entries for checkpoints created before 1.11. Chunked and idempotent — safe to re-run.
+
+| Option | Description |
+|---|---|
+| `--chunk=1000` | Number of entries to stamp per update batch |
+| `--dry-run` | Report what would change without writing |
+
+See the [Upgrade Guide](./upgrade-guide.md#upgrading-to-111).
+
+---
+
+## `chronicle:anchor:retry`
+
+```bash
+php artisan chronicle:anchor:retry [--status=failed]
+```
+
+Re-attempts outstanding checkpoint anchors. Anchoring must be enabled and a provider configured (see [External Anchoring](./anchoring.md)).
+
+| Option | Description |
+|---|---|
+| `--status=` | Retry anchors in this status: `pending` or `failed` (default `failed`) |
+
+---
+
+## `chronicle:anchor:verify`
+
+```bash
+php artisan chronicle:anchor:verify [--checkpoint=<ULID>]
+```
+
+Verifies stored checkpoint anchors against their providers.
+
+| Option | Description |
+|---|---|
+| `--checkpoint=<ULID>` | Verify anchors for a single checkpoint (default: all anchored checkpoints) |

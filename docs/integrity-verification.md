@@ -28,14 +28,17 @@ For each entry it verifies:
 
 ## Failure types
 
-The current verifier can fail with:
+Full verification can fail with:
 
 - `payload_hash_mismatch`
 - `chain_hash_mismatch`
 - `checkpoint_missing`
 - `checkpoint_signature_invalid`
+- `unknown_key`
 
 The command also reports the entry id where corruption begins.
+
+Chronicle v1.11 adds cheaper, scoped verification modes (`--checkpoints-only`, `--since-last-checkpoint`, `--from-checkpoint`/`--to-checkpoint`, `--resume`) and an external-anchor pass (`--anchors`), each with its own failure reasons (`checkpoint_chain_broken`, `checkpoint_head_mismatch`, `segment_discontinuous`, `anchor_invalid`). See [Scalable Verification](./scalable-verification.md).
 
 ## Why this differs from export verification
 
