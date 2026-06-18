@@ -77,6 +77,54 @@ The `chronicle_checkpoints` table stores:
 
 Checkpoints anchor the ledger at a specific chain head so later verification has a signed reference point.
 
+## Subject keys (v1.12)
+
+When encryption is enabled, each subject has one wrapped Data Encryption Key in
+the `chronicle_subject_keys` table:
+
+- `id` - ULID
+- `subject_type`
+- `subject_id`
+- `wrapped_dek` - the DEK wrapped under the KEK; **nullable** (nulled on erasure)
+- `kek_id` - which KEK wrapped this DEK (used by KEK rotation)
+- `status` - `active` or `erased`
+- `created_at`
+- `erased_at` - nullable; set when the subject is erased
+
+Erasing a subject nulls `wrapped_dek`, sets `status = 'erased'`, and stamps
+`erased_at` - the tombstone row survives so the erasure is auditable, but the key
+material is gone. See [Crypto-Shredding & Encryption](./crypto-shredding.md).
+
+### Encrypted field envelope
+
+An encrypted payload field is stored as a self-describing envelope in both the
+hashed `payload` JSON and its denormalized column:
+
+```json
+{
+  "_chronicle_enc": "v1",
+  "nonce": "<base64, 24 bytes>",
+  "ciphertext": "<base64>"
+}
+```
+
+## Legal holds (v1.12)
+
+The `chronicle_legal_holds` table records litigation/legal holds that block
+erasure and pruning of a subject:
+
+- `id` - ULID
+- `subject_type`
+- `subject_id`
+- `reason` - nullable
+- `placed_by` - nullable
+- `placed_at`
+- `released_at` - nullable; a hold is **active** while this is null
+
+An indexed `(subject_type, subject_id)` lookup backs the hold check. While an
+active hold exists, `chronicle:subject:erase` refuses the subject (unless
+`--force`, which is audited) and `chronicle:prune` excludes its entries.
+
 ## Integrity rules
 
 Chronicle’s core integrity invariants are:

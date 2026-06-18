@@ -77,15 +77,15 @@ These protect against partial or reordered exports.
 
 ## Tampering detection summary
 
-| Attack | How it is detected |
-|---|---|
-| Entry modification | `payload_hash` mismatch |
-| Entry deletion | chain hash break at gap |
-| Entry insertion | chain hash break from that point |
-| Entry reordering | chain hash break from that point |
-| Dataset modification | `dataset_hash` mismatch |
-| Dataset truncation | `entry_count` / boundary mismatch |
-| Dataset forgery | signature verification failure |
+| Attack                          | How it is detected                                          |
+|---------------------------------|-------------------------------------------------------------|
+| Entry modification              | `payload_hash` mismatch                                     |
+| Entry deletion                  | chain hash break at gap                                     |
+| Entry insertion                 | chain hash break from that point                            |
+| Entry reordering                | chain hash break from that point                            |
+| Dataset modification            | `dataset_hash` mismatch                                     |
+| Dataset truncation              | `entry_count` / boundary mismatch                           |
+| Dataset forgery                 | signature verification failure                              |
 | Full internal rewrite + re-sign | external anchor mismatch under `chronicle:verify --anchors` |
 
 ## What Chronicle does not guarantee
@@ -175,6 +175,55 @@ When using a remote signing service such as AWS KMS or HashiCorp Vault:
 - `verify()` should run locally against a cached public key (see [`LocalVerifyProvider`](./custom-signing-providers.md) in Custom Signing Providers).
 - Verification does not require connectivity to the signing service. Offline verification is always possible with the cached public key.
 - A connectivity failure in `sign()` will cause `chronicle:checkpoint` and `chronicle:export` to fail. Plan for retries in your deployment pipeline.
+
+## Payload encryption & crypto-shredding (v1.12)
+
+When encryption is enabled, Chronicle encrypts the configured payload fields
+(`metadata`/`context`/`diff` by default) under a per-subject Data Encryption Key
+before hashing, so destroying that key (GDPR erasure) renders the subject's
+content permanently unreadable while the ledger still verifies. See
+[Crypto-Shredding & Encryption](./crypto-shredding.md) for the feature guide.
+
+### Cipher, nonce, and AAD
+
+- **Cipher:** libsodium XChaCha20-Poly1305-IETF (authenticated encryption).
+- **Nonce:** a fresh 192-bit nonce is generated per encryption - never reused.
+- **Associated Data (AAD):** the cleartext envelope `(action, id, subject_id,
+  subject_type)` is bound into every ciphertext. Moving a ciphertext to a
+  different entry changes the AAD, so decryption fails - a ciphertext cannot be
+  transplanted.
+
+### Hashes cover ciphertext
+
+Encryption runs *before* hashing, so `payload_hash` and `chain_hash` cover the
+ciphertext envelope, not the plaintext. Verification never decrypts - it checks
+the stored envelope's hashes - so an erased subject's entries still verify.
+
+### KEK compromise vs. integrity
+
+The KEK protects **confidentiality**, not integrity. A leaked KEK lets an
+attacker unwrap DEKs and read encrypted PII, but it does **not** let them forge
+the hash chain or checkpoint signatures - those are protected by the signing key
+and external anchors. Confidentiality and integrity have separate trust roots:
+rotate the KEK (`chronicle:encryption:rotate-kek`) on KEK compromise; rotate the
+**signing** key on signing-key compromise.
+
+### Erasure completeness: live store vs. backups
+
+Crypto-shredding guarantees that after `eraseSubject`, **no DEK remains in the
+live store** - `wrapped_dek` is nulled, the row is tombstoned, and the
+process-local DEK cache is purged, so decryption is impossible against the live
+database.
+
+It cannot, however, reach **backups taken before the erasure**. A backup may
+still contain the wrapped DEK, and with the contemporaneous KEK it would remain
+decryptable. Operationally you must:
+
+- expire/rotate database backups within your erasure SLA, and
+- rotate the KEK after large erasure events,
+
+so that old backups cannot be combined with a current KEK to recover erased PII.
+This boundary is a property of backups, not of the cipher.
 
 ## Security philosophy
 
