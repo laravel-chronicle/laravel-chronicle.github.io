@@ -56,6 +56,7 @@ const sidebars: SidebarsConfig = {
       label: 'Encryption & Erasure',
       items: [
         'crypto-shredding',
+        'gdpr-erasure',
       ],
     },
     {

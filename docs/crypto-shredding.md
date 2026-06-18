@@ -152,9 +152,8 @@ $entry->decryptedMetadata();
 // ['_erased' => true, 'erased_at' => '2026-06-18T10:00:00+00:00']
 ```
 
-The full erasure workflow, the audited proof, and legal holds are covered on the
-GDPR Erasure page (added in the next docs release - Task 3 of this plan replaces
-this sentence with a live link once that page exists).
+The full erasure workflow, the audited proof, and legal holds are covered in
+[GDPR Erasure](./gdpr-erasure.md).
 
 ## Inspecting subject keys
 
