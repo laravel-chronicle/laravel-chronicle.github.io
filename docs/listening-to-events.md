@@ -38,8 +38,8 @@ Event::listen(EntryRecorded::class, function (EntryRecorded $event) {
 });
 
 Event::listen(EntryRejected::class, function (EntryRejected $event) {
-    // $event->reason  — the exception that caused the rejection
-    // $event->payload — raw entry attributes at rejection time
+    // $event->reason  - the exception that caused the rejection
+    // $event->payload - raw entry attributes at rejection time
     logger()->warning('Chronicle entry rejected', [
         'reason' => $event->reason->getMessage(),
         'action' => $event->payload['action'] ?? null,
@@ -49,7 +49,7 @@ Event::listen(EntryRejected::class, function (EntryRejected $event) {
 
 ## Important: queued driver timing
 
-`EntryRecorded` is dispatched by the synchronous `PersistEntry` pipeline stage. When `driver = 'queued'`, that stage is bypassed — `EntryRecorded` is **not fired**. See [Events Reference](./events.md) for the full explanation.
+`EntryRecorded` is dispatched by the synchronous `PersistEntry` pipeline stage. When `driver = 'queued'`, that stage is bypassed - `EntryRecorded` is **not fired**. See [Events Reference](./events.md) for the full explanation.
 
 ## Full event documentation
 
@@ -57,6 +57,6 @@ For payload details, property types, and more examples see the [Events Reference
 
 ## See also
 
-- [Events Reference](./events.md) — `EntryRecorded` and `EntryRejected` payload docs
-- [Storage Drivers](./storage-drivers.md) — queued driver and its effect on event timing
-- [Extension Architecture](./extending-chronicle.md) — using extensions as an alternative hook point
+- [Events Reference](./events.md) - `EntryRecorded` and `EntryRejected` payload docs
+- [Storage Drivers](./storage-drivers.md) - queued driver and its effect on event timing
+- [Extension Architecture](./extending-chronicle.md) - using extensions as an alternative hook point

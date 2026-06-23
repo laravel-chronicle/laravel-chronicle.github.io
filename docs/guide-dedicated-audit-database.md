@@ -57,7 +57,7 @@ If you prefer the audit migrations never appear in your default `migrations` tab
 php artisan chronicle:stats
 ```
 
-The command uses the configured `connection` — if it shows `0 entries` after recording some, the connection is pointing at the wrong database.
+The command uses the configured `connection` - if it shows `0 entries` after recording some, the connection is pointing at the wrong database.
 
 You can also confirm directly:
 
@@ -68,6 +68,6 @@ php artisan tinker
 
 ## See also
 
-- [Config Reference](./config-reference.md) — `connection` config key
-- [Storage Drivers](./storage-drivers.md) — how `DatabaseDriver` uses the connection
-- [Installation](./installation.md) — recommended production setup
+- [Config Reference](./config-reference.md) - `connection` config key
+- [Storage Drivers](./storage-drivers.md) - how `DatabaseDriver` uses the connection
+- [Installation](./installation.md) - recommended production setup

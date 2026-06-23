@@ -26,7 +26,7 @@ class Order extends Model
 {
     use HasChronicle;
 
-    // Record only create and delete — skip update noise
+    // Record only create and delete - skip update noise
     protected array $chronicleEvents = ['created', 'deleted'];
 
     // Exclude these fields from update diffs
@@ -53,7 +53,7 @@ For models you cannot modify, register an observer in a service provider:
 ```php
 use Chronicle\Facades\Chronicle;
 
-// Default observer — works for most cases
+// Default observer - works for most cases
 Chronicle::observe(Invoice::class);
 
 // Custom observer for fine-grained control
@@ -79,5 +79,5 @@ $chronicle->assertRecorded(fn ($e) => $e['action'] === 'order.created');
 
 ## See also
 
-- [Auditing Eloquent Models](./auditing-eloquent-models.md) — full trait and observer reference
-- [Testing Helpers](./testing-helpers.md) — `Chronicle::fake()` and assertion methods
+- [Auditing Eloquent Models](./auditing-eloquent-models.md) - full trait and observer reference
+- [Testing Helpers](./testing-helpers.md) - `Chronicle::fake()` and assertion methods

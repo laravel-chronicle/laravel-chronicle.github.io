@@ -6,7 +6,7 @@ title: Auditing Eloquent Models
 
 Chronicle provides two opt-in mechanisms for automatically recording audit entries when Eloquent models change: the `HasChronicle` trait (for your own models) and `ChronicleModelObserver` (for third-party models you cannot modify).
 
-Both are **explicit opt-in** — Chronicle never attaches global observers automatically.
+Both are **explicit opt-in** - Chronicle never attaches global observers automatically.
 
 ## `HasChronicle` trait
 
@@ -25,13 +25,13 @@ Chronicle will record entries on `created`, `updated`, and `deleted` model event
 
 ### Default behaviour
 
-| Event | Action recorded |
-|---|---|
-| `created` | `order.created` |
+| Event     | Action recorded                               |
+|-----------|-----------------------------------------------|
+| `created` | `order.created`                               |
 | `updated` | `order.updated` (with diff, if changes exist) |
-| `deleted` | `order.deleted` |
+| `deleted` | `order.deleted`                               |
 
-The action prefix defaults to `snake_case` of the model's base class name (e.g. `OrderItem` → `order_item`).
+The action prefix defaults to `snake_case` of the model's base class name (e.g. `OrderItem` -> `order_item`).
 
 The actor defaults to `Auth::user() ?? 'system'`.
 
@@ -144,10 +144,10 @@ The base `ChronicleModelObserver` records `created`, `updated`, and `deleted` by
 
 ## Low magic
 
-Chronicle's Eloquent integration is deliberately explicit. You must opt each model in individually. There are no global hooks, no automatic activity recording, and no framework-level interception. Every audit entry that Chronicle records is the result of a deliberate developer decision — either a direct `Chronicle::record()` call or an explicit observer registration.
+Chronicle's Eloquent integration is deliberately explicit. You must opt each model in individually. There are no global hooks, no automatic activity recording, and no framework-level interception. Every audit entry that Chronicle records is the result of a deliberate developer decision - either a direct `Chronicle::record()` call or an explicit observer registration.
 
 ## See also
 
-- [Recording Entries](./recording-entries.md) — the `EntryBuilder` API used under the hood
-- [Diff Engine](./diff-engine.md) — how diffs are structured
-- [Testing Helpers](./testing-helpers.md) — asserting model-triggered entries in tests
+- [Recording Entries](./recording-entries.md) - the `EntryBuilder` API used under the hood
+- [Diff Engine](./diff-engine.md) - how diffs are structured
+- [Testing Helpers](./testing-helpers.md) - asserting model-triggered entries in tests

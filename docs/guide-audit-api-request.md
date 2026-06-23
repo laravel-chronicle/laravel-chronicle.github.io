@@ -92,6 +92,6 @@ Or query directly:
 
 ## See also
 
-- [Recording Entries](./recording-entries.md) — full `EntryBuilder` API
-- [Context Resolvers](./context-resolvers.md) — built-in context resolvers
-- [Transactions](./transactions.md) — grouping entries under a correlation id
+- [Recording Entries](./recording-entries.md) - full `EntryBuilder` API
+- [Context Resolvers](./context-resolvers.md) - built-in context resolvers
+- [Transactions](./transactions.md) - grouping entries under a correlation id

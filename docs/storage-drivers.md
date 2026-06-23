@@ -10,7 +10,7 @@ Chronicle persists entries through a configurable storage driver.
 
 ## `eloquent` / `database`
 
-`eloquent` is the default production driver. `database` is an alias — both resolve to the same synchronous implementation (`DatabaseDriver`).
+`eloquent` is the default production driver. `database` is an alias - both resolve to the same synchronous implementation (`DatabaseDriver`).
 
 Despite the name, this driver does **not** use Eloquent model events. It writes entries through Laravel’s raw DB query builder to avoid timestamp machinery and observer interference. It respects the configured `connection` and `tables` settings.
 
@@ -26,7 +26,7 @@ The `queued` driver dispatches entry persistence to a background job (`PersistCh
 php artisan queue:work --queue=chronicle --tries=1
 ```
 
-Running multiple workers on this queue will produce chain forks — two workers can each read the same previous chain head and generate competing next hashes.
+Running multiple workers on this queue will produce chain forks - two workers can each read the same previous chain head and generate competing next hashes.
 
 Configure the queue connection and name in `config/chronicle.php`:
 
@@ -39,7 +39,7 @@ Configure the queue connection and name in `config/chronicle.php`:
 
 **What the job does:** the job receives the pre-validated, pre-hashed payload attributes. Inside a database transaction it acquires a row-level lock, computes the chain hash, and persists the entry via `DatabaseDriver`.
 
-**Event timing:** `EntryRecorded` is dispatched by the synchronous `PersistEntry` pipeline stage. The `queued` driver bypasses that stage — `EntryRecorded` is **not** fired when this driver is active.
+**Event timing:** `EntryRecorded` is dispatched by the synchronous `PersistEntry` pipeline stage. The `queued` driver bypasses that stage - `EntryRecorded` is **not** fired when this driver is active.
 
 ## `array`
 

@@ -75,7 +75,7 @@ $entries = Entry::query()
     ->get();
 ```
 
-Use this when nested Chronicle transactions produce hierarchical correlation ids and you want the full workflow trace.
+Use this when nested Chronicle transactions produce hierarchical correlation ids, and you want the full workflow trace.
 
 ## `withTag(string $tag)`
 

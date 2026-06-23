@@ -17,7 +17,7 @@ CHRONICLE_QUEUE=chronicle
 
 ## 2. Start exactly one worker
 
-Chronicle's chain hashes are order-sensitive. Running multiple workers on the same queue will produce chain forks — two workers can each read the same previous chain head and generate competing next hashes.
+Chronicle's chain hashes are order-sensitive. Running multiple workers on the same queue will produce chain forks - two workers can each read the same previous chain head and generate competing next hashes.
 
 ```bash
 php artisan queue:work --queue=chronicle --tries=1
@@ -47,12 +47,12 @@ Chronicle::record()
     ->action('order.created')
     ->subject($order)
     ->commit();
-// Returns immediately — persistence happens in the worker
+// Returns immediately - persistence happens in the worker
 ```
 
 ## What changes with the queued driver
 
-- **`EntryRecorded` does not fire** — the event is dispatched by the synchronous pipeline stage which the queued driver bypasses. See [Events Reference](./events.md).
+- **`EntryRecorded` does not fire** - the event is dispatched by the synchronous pipeline stage which the queued driver bypasses. See [Events Reference](./events.md).
 - Entries appear in the ledger after the worker processes the job, not immediately.
 - Chain hashing happens inside the job under a database transaction with row-level locking.
 
@@ -69,6 +69,6 @@ Entry count should increase by the number of entries committed before the worker
 
 ## See also
 
-- [Storage Drivers](./storage-drivers.md) — full queued driver details
-- [Config Reference](./config-reference.md) — `queue` config block
-- [Events Reference](./events.md) — `EntryRecorded` timing with the queued driver
+- [Storage Drivers](./storage-drivers.md) - full queued driver details
+- [Config Reference](./config-reference.md) - `queue` config block
+- [Events Reference](./events.md) - `EntryRecorded` timing with the queued driver

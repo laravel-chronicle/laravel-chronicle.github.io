@@ -26,14 +26,14 @@ Since v1.10, Chronicle manages signing through a **key ring**: a named collectio
 ],
 ```
 
-| Config key | Env var | Description |
-|---|---|---|
-| `signing.active` | `CHRONICLE_ACTIVE_KEY` | ID of the key used to sign new checkpoints and exports. Must match a key in `signing.keys`. |
-| `signing.enforce_on_boot` | `CHRONICLE_SIGNING_ENFORCE_ON_BOOT` | When `true`, Chronicle throws at boot if the active key is misconfigured. Retired keys are not checked. |
-| `signing.keys[id].provider` | — | Class implementing `Chronicle\Contracts\SigningProvider`. |
-| `signing.keys[id].algorithm` | — | Stable identifier stored in artifacts (e.g. `'ed25519'`, `'ecdsa-p256'`). |
-| `signing.keys[id].private_key` | — | Base64-encoded private key. Omit or set to `null` to create a verify-only retired key. |
-| `signing.keys[id].public_key` | — | Base64-encoded public key. Required for all keys including retired ones. |
+| Config key                     | Env var                             | Description                                                                                             |
+|--------------------------------|-------------------------------------|---------------------------------------------------------------------------------------------------------|
+| `signing.active`               | `CHRONICLE_ACTIVE_KEY`              | ID of the key used to sign new checkpoints and exports. Must match a key in `signing.keys`.             |
+| `signing.enforce_on_boot`      | `CHRONICLE_SIGNING_ENFORCE_ON_BOOT` | When `true`, Chronicle throws at boot if the active key is misconfigured. Retired keys are not checked. |
+| `signing.keys[id].provider`    | -                                   | Class implementing `Chronicle\Contracts\SigningProvider`.                                               |
+| `signing.keys[id].algorithm`   | -                                   | Stable identifier stored in artifacts (e.g. `'ed25519'`, `'ecdsa-p256'`).                               |
+| `signing.keys[id].private_key` | -                                   | Base64-encoded private key. Omit or set to `null` to create a verify-only retired key.                  |
+| `signing.keys[id].public_key`  | -                                   | Base64-encoded public key. Required for all keys including retired ones.                                |
 
 ## Generating a keypair
 
@@ -43,7 +43,7 @@ Use the built-in Artisan command to generate an Ed25519 keypair:
 php artisan chronicle:key:generate --id=my-key
 ```
 
-This prints the base64-encoded keys and a ready-to-paste `signing.keys` entry. The private key is never written to disk or any environment file — you copy it into your secret manager manually.
+This prints the base64-encoded keys and a ready-to-paste `signing.keys` entry. The private key is never written to disk or any environment file - you copy it into your secret manager manually.
 
 See [chronicle:key:generate](./artisan-commands.md) for the full command reference.
 
@@ -51,22 +51,22 @@ See [chronicle:key:generate](./artisan-commands.md) for the full command referen
 
 With the default `Ed25519SigningProvider`:
 
-| Key | Required length after base64 decode |
-|---|---|
+| Key           | Required length after base64 decode            |
+|---------------|------------------------------------------------|
 | `private_key` | 64 bytes (`SODIUM_CRYPTO_SIGN_SECRETKEYBYTES`) |
-| `public_key` | 32 bytes (`SODIUM_CRYPTO_SIGN_PUBLICKEYBYTES`) |
+| `public_key`  | 32 bytes (`SODIUM_CRYPTO_SIGN_PUBLICKEYBYTES`) |
 
 With `EcdsaSigningProvider` (ECDSA P-256), `private_key` and `public_key` are PEM strings, not base64-encoded binary.
 
 ## Boot-time enforcement
 
-When `enforce_on_boot` is `true`, Chronicle validates the active key during service provider boot and throws a `RuntimeException` if it is missing or misconfigured. Retired keys in the ring without a `private_key` do not trigger this check — only the active key is validated.
+When `enforce_on_boot` is `true`, Chronicle validates the active key during service provider boot and throws a `RuntimeException` if it is missing or misconfigured. Retired keys in the ring without a `private_key` do not trigger this check - only the active key is validated.
 
 The check is silenced automatically in the `testing` environment.
 
 ## Key rotation
 
-Key rotation replaces the active signing key for new artifacts without losing the ability to verify existing checkpoints and exports signed by the old key. The old key's `public_key` must remain in the ring indefinitely — it is the only material that can verify artifacts already signed with it.
+Key rotation replaces the active signing key for new artifacts without losing the ability to verify existing checkpoints and exports signed by the old key. The old key's `public_key` must remain in the ring indefinitely - it is the only material that can verify artifacts already signed with it.
 
 ### Step-by-step rotation workflow
 
@@ -123,7 +123,7 @@ php artisan chronicle:verify
 php artisan chronicle:key:list
 ```
 
-The full ledger — entries and checkpoints from both before and after the rotation — should verify cleanly.
+The full ledger - entries and checkpoints from both before and after the rotation - should verify cleanly.
 
 ### Retain old public keys forever
 
@@ -141,7 +141,7 @@ Example two-key ring after rotation:
 'signing' => [
     'active' => env('CHRONICLE_ACTIVE_KEY', 'my-key-2026'),
     'keys' => [
-        // Retired — private key removed, public key retained for verification
+        // Retired - private key removed, public key retained for verification
         'chronicle-dev-key' => [
             'provider'   => \Chronicle\Signing\Ed25519SigningProvider::class,
             'algorithm'  => 'ed25519',
@@ -178,7 +178,7 @@ Adds a per-key checkpoint count column.
 
 ## See also
 
-- [Artisan Commands](./artisan-commands.md) — `chronicle:key:generate`, `chronicle:key:list`, `chronicle:key:rotate` references
-- [Custom Signing Providers](./custom-signing-providers.md) — implementing KMS, Vault, or other backends
-- [Security Model](./security-model.md) — what rotation does and does not guarantee
-- [Checkpoints](./checkpoints.md) — what gets signed at checkpoint time
+- [Artisan Commands](./artisan-commands.md) - `chronicle:key:generate`, `chronicle:key:list`, `chronicle:key:rotate` references
+- [Custom Signing Providers](./custom-signing-providers.md) - implementing KMS, Vault, or other backends
+- [Security Model](./security-model.md) - what rotation does and does not guarantee
+- [Checkpoints](./checkpoints.md) - what gets signed at checkpoint time

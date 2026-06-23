@@ -8,7 +8,7 @@ Chronicle is designed for high-volume append-only audit writes. This page covers
 
 ## Recommended access patterns
 
-- Use cursor pagination for browsing large ledgers — it avoids expensive offset scans
+- Use cursor pagination for browsing large ledgers - it avoids expensive offset scans
 - Use streaming for exports, verification passes, and batch analysis
 - Use `latestFirst()` for operational review screens
 - Use `withTags()` with a JSON index on large PostgreSQL datasets (see below)
@@ -27,7 +27,7 @@ $page = Entry::query()->cursorPaginateLedger(100);
 $page = Entry::query()->cursorPaginateLatest(100);
 ```
 
-Cursor pagination is the right default for large audit datasets — it avoids the `OFFSET` scans that slow down traditional pagination.
+Cursor pagination is the right default for large audit datasets - it avoids the `OFFSET` scans that slow down traditional pagination.
 
 ### Streaming
 
@@ -49,7 +49,7 @@ $latest = Entry::query()->streamLatest()->take(50)->pluck('action');
 
 ## Checkpoint cadence & verification cost
 
-Full verification is `O(entries)`. Chronicle v1.11's [scalable verification](./scalable-verification.md) modes — `--checkpoints-only`, `--since-last-checkpoint`, `--from-checkpoint`, and `--resume` — bound that cost by checkpoint spacing: the closer your checkpoints, the smaller each incremental pass. Pick a cadence that matches write volume and recovery objectives; a common pattern is a scheduled checkpoint plus one every N entries. See [Schedule Checkpoints & Exports](./guide-schedule-checkpoints-exports.md).
+Full verification is `O(entries)`. Chronicle v1.11's [scalable verification](./scalable-verification.md) modes - `--checkpoints-only`, `--since-last-checkpoint`, `--from-checkpoint`, and `--resume` - bound that cost by checkpoint spacing: the closer your checkpoints, the smaller each incremental pass. Pick a cadence that matches write volume and recovery objectives; a common pattern is a scheduled checkpoint plus one every N entries. See [Schedule Checkpoints & Exports](./guide-schedule-checkpoints-exports.md).
 
 ## Built-in indexes
 
@@ -67,7 +67,7 @@ These cover the most common Chronicle query patterns. No additional indexes are 
 
 Each entry carries a `checkpoint_id`, populated on the entries a checkpoint covers when that checkpoint is created. The v1.11 migration adds an index on `chronicle_entries.checkpoint_id` (a foreign key alone does not create one on every database), so checkpoint-scoped lookups and the incremental verification modes stay cheap on large ledgers.
 
-The checkpoints table also gains `head_id` (indexed), `entry_count`, and `previous_checkpoint_id` (indexed) so the checkpoint chain is walkable without scanning entries — this is what powers `--checkpoints-only` and the segment modes.
+The checkpoints table also gains `head_id` (indexed), `entry_count`, and `previous_checkpoint_id` (indexed) so the checkpoint chain is walkable without scanning entries - this is what powers `--checkpoints-only` and the segment modes.
 
 ## PostgreSQL JSON indexes
 
@@ -79,7 +79,7 @@ The built-in `withTag()` and `withTags()` scopes use `whereJsonContains()` for t
 
 ### Important constraint
 
-Chronicle's migrations use Laravel's `json` column type, not `jsonb`. On PostgreSQL this means you cannot get the full benefit of GIN indexing directly on the column — the standard approach is an expression index that casts to `jsonb`.
+Chronicle's migrations use Laravel's `json` column type, not `jsonb`. On PostgreSQL this means you cannot get the full benefit of GIN indexing directly on the column - the standard approach is an expression index that casts to `jsonb`.
 
 ### Recommended index for tags
 
@@ -158,6 +158,6 @@ GIN indexes improve read performance at the cost of additional disk space and wr
 
 ## See also
 
-- [Scalable Verification](./scalable-verification.md) — the verification modes and their cost
-- [Query API](./query-api.md) — scopes and reader methods that drive these access patterns
-- [Config Reference](./config-reference.md) — dedicated connection and custom table names
+- [Scalable Verification](./scalable-verification.md) - the verification modes and their cost
+- [Query API](./query-api.md) - scopes and reader methods that drive these access patterns
+- [Config Reference](./config-reference.md) - dedicated connection and custom table names

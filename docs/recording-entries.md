@@ -24,10 +24,10 @@ Chronicle::record()
 
 Three fields are required. Missing any one throws an exception at `commit()` time:
 
-| Method | Exception thrown |
-|---|---|
-| `actor()` | `Chronicle\Exceptions\MissingActorException` |
-| `action()` | `Chronicle\Exceptions\MissingActionException` |
+| Method      | Exception thrown                               |
+|-------------|------------------------------------------------|
+| `actor()`   | `Chronicle\Exceptions\MissingActorException`   |
+| `action()`  | `Chronicle\Exceptions\MissingActionException`  |
 | `subject()` | `Chronicle\Exceptions\MissingSubjectException` |
 
 ## Full API reference
@@ -36,7 +36,7 @@ Three fields are required. Missing any one throws an exception at `commit()` tim
 
 Sets the actor responsible for the action. Accepts an Eloquent model, any object resolvable by your `ReferenceResolver`, or a string.
 
-The string `'system'` is a special case — it records as type `system` / id `system` without going through the resolver:
+The string `'system'` is a special case - it records as type `system` / id `system` without going through the resolver:
 
 ```php
 ->actor($user)          // Eloquent model
@@ -79,7 +79,7 @@ Attaches domain-specific data to the entry. Anything you want to preserve as par
 
 ### `context(array $context)`
 
-Attaches execution context — environment or runtime data that describes *where* the action occurred rather than *what* it was:
+Attaches execution context - environment or runtime data that describes *where* the action occurred rather than *what* it was:
 
 ```php
 ->context([
@@ -161,9 +161,9 @@ An alias for `modelDiff()`. Deprecated since 1.x; will be removed in 2.0. Use `m
 
 ### `build()` vs `commit()`
 
-| Method | What it does |
-|---|---|
-| `build()` | Validates the builder state and returns the raw payload `array`. Does **not** persist. |
+| Method     | What it does                                                                                    |
+|------------|-------------------------------------------------------------------------------------------------|
+| `build()`  | Validates the builder state and returns the raw payload `array`. Does **not** persist.          |
 | `commit()` | Calls `build()`, then passes the payload through the Chronicle pipeline (hash, chain, persist). |
 
 Use `build()` when you need to inspect or transform the payload before committing. In the normal case, call `commit()` directly.
@@ -184,7 +184,7 @@ Chronicle::record()
 
 ## See also
 
-- [Auditing Eloquent Models](./auditing-eloquent-models.md) — automatic recording with `HasChronicle`
-- [Diff Engine](./diff-engine.md) — diff structure details
-- [Transactions](./transactions.md) — grouping entries under a correlation id
-- [Testing Helpers](./testing-helpers.md) — asserting entries in tests
+- [Auditing Eloquent Models](./auditing-eloquent-models.md) - automatic recording with `HasChronicle`
+- [Diff Engine](./diff-engine.md) - diff structure details
+- [Transactions](./transactions.md) - grouping entries under a correlation id
+- [Testing Helpers](./testing-helpers.md) - asserting entries in tests

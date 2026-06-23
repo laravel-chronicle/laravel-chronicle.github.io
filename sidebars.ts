@@ -89,6 +89,23 @@ const sidebars: SidebarsConfig = {
     },
     {
       type: 'category',
+      label: 'Filament Plugin',
+      items: [
+        'filament-installation',
+        'filament-verification',
+        'filament-configuration',
+      ],
+    },
+    {
+      type: 'category',
+      label: 'Adapters',
+      items: [
+        'kms-aws',
+        'anchor-s3',
+      ],
+    },
+    {
+      type: 'category',
       label: 'Guides / How-To',
       items: [
         'guide-audit-eloquent-models',
@@ -107,6 +124,7 @@ const sidebars: SidebarsConfig = {
       items: [
         'extending-chronicle',
         'entry-extensions',
+        'custom-entry-model',
         'custom-validators',
         'custom-policies',
         'custom-context-resolvers',

@@ -4,7 +4,7 @@ title: Policies
 
 # Policies
 
-Policies govern which audit entries are allowed to be recorded. They run after validation and context resolution, before Chronicle canonicalizes and hashes the entry — so a rejected entry never touches the ledger.
+Policies govern which audit entries are allowed to be recorded. They run after validation and context resolution, before Chronicle canonicalizes and hashes the entry - so a rejected entry never touches the ledger.
 
 Six built-in policies cover the most common enforcement needs. All are opt-in.
 
@@ -27,7 +27,7 @@ POLICY stage
 PROCESS stage
 ↓  your extensions...
 ↓
-CanonicalizePayload → HashPayload → ChainHashEntry → PersistEntry
+CanonicalizePayload -> HashPayload -> ChainHashEntry -> PersistEntry
 ```
 
 If any policy throws, the entry is rejected and nothing is written to the ledger.
@@ -51,20 +51,20 @@ ChronicleException
 
 All six policies live in `Chronicle\Policy\` and are commented out in `config/chronicle.php` by default.
 
-| Policy | What it enforces | Throws |
-|--------|-----------------|--------|
-| `OnlyAuthenticatedUsersPolicy` | Actor must be authenticated | `UnauthenticatedActorException` |
-| `AllowedActionsPolicy` | Action must match a configured allowlist | `ActionNotAllowedException` |
-| `ForbiddenActionsPolicy` | Action must not match a configured denylist | `ActionForbiddenException` |
-| `RateLimitPolicy` | Actor must not exceed a configured rate cap | `RateLimitExceededException` |
-| `TimeWindowPolicy` | Current time must fall within a configured window | `OutsideTimeWindowException` |
-| `ContextPolicy` | Entry context must contain all required keys | `RequiredContextMissingException` |
+| Policy                         | What it enforces                                  | Throws                            |
+|--------------------------------|---------------------------------------------------|-----------------------------------|
+| `OnlyAuthenticatedUsersPolicy` | Actor must be authenticated                       | `UnauthenticatedActorException`   |
+| `AllowedActionsPolicy`         | Action must match a configured allowlist          | `ActionNotAllowedException`       |
+| `ForbiddenActionsPolicy`       | Action must not match a configured denylist       | `ActionForbiddenException`        |
+| `RateLimitPolicy`              | Actor must not exceed a configured rate cap       | `RateLimitExceededException`      |
+| `TimeWindowPolicy`             | Current time must fall within a configured window | `OutsideTimeWindowException`      |
+| `ContextPolicy`                | Entry context must contain all required keys      | `RequiredContextMissingException` |
 
 ### OnlyAuthenticatedUsersPolicy
 
 Rejects entries when no authenticated user session is active (`Auth::check()` returns false).
 
-Skips automatically when running in a console or queue worker context — `app()->runningInConsole()` returns true for both Artisan commands and queue workers, so jobs dispatched to the queue are never blocked by this policy.
+Skips automatically when running in a console or queue worker context - `app()->runningInConsole()` returns true for both Artisan commands and queue workers, so jobs dispatched to the queue are never blocked by this policy.
 
 No configuration keys.
 
@@ -88,17 +88,17 @@ Rejects any action **not** present in the configured allowlist. Supports `Str::i
 ```
 
 ```text
-user.created   → matches user.*      → passes
-order.placed   → exact match         → passes
-payment.refunded → matches payment.* → passes
-debug.dump     → no match            → ActionNotAllowedException
+user.created   -> matches user.*      -> passes
+order.placed   -> exact match         -> passes
+payment.refunded -> matches payment.* -> passes
+debug.dump     -> no match            -> ActionNotAllowedException
 ```
 
 ### ForbiddenActionsPolicy
 
 Rejects any action **matching** the configured denylist. Same `Str::is()` wildcard syntax.
 
-**An empty denylist forbids nothing** — the policy is a no-op when unconfigured.
+**An empty denylist forbids nothing** - the policy is a no-op when unconfigured.
 
 ```php
 'policy' => [
@@ -106,7 +106,7 @@ Rejects any action **matching** the configured denylist. Same `Str::is()` wildca
 ],
 ```
 
-When both `AllowedActionsPolicy` and `ForbiddenActionsPolicy` are enabled simultaneously, an action must satisfy both: it must appear in the allowlist **and** not appear in the denylist. Both policies check independently — the caller sees the exception from whichever policy rejects first.
+When both `AllowedActionsPolicy` and `ForbiddenActionsPolicy` are enabled simultaneously, an action must satisfy both: it must appear in the allowlist **and** not appear in the denylist. Both policies check independently - the caller sees the exception from whichever policy rejects first.
 
 ### RateLimitPolicy
 
@@ -146,19 +146,19 @@ Rejects entries recorded outside the configured hours and days of the week. Uses
 
 - `days` is case-insensitive. An empty `days` array applies the time restriction every day.
 - `timezone` falls back to `config('app.timezone')` when `null`.
-- Bounds are **inclusive** — exactly `09:00:00` and `17:00:00` are allowed.
+- Bounds are **inclusive** - exactly `09:00:00` and `17:00:00` are allowed.
 - Default `end` is `'23:59:59'` to avoid a 60-second blind spot at end of day.
 
-**Midnight-spanning windows are not supported.** If `start >= end`, the policy throws `\InvalidArgumentException` at construction time — this is a misconfiguration error, not an entry rejection.
+**Midnight-spanning windows are not supported.** If `start >= end`, the policy throws `\InvalidArgumentException` at construction time - this is a misconfiguration error, not an entry rejection.
 
 ```php
-// Invalid — throws \InvalidArgumentException immediately
+// Invalid - throws \InvalidArgumentException immediately
 'time_window' => ['start' => '22:00', 'end' => '06:00', ...],
 ```
 
 ### ContextPolicy
 
-Rejects entries whose `context` attribute is missing any required top-level key. Checks key **existence** only — not value type or content.
+Rejects entries whose `context` attribute is missing any required top-level key. Checks key **existence** only - not value type or content.
 
 ```php
 'policy' => [
@@ -175,7 +175,7 @@ Rejects entries whose `context` attribute is missing any required top-level key.
 ```
 
 - An empty `required_context_keys` list is a no-op.
-- If `context` is `null` or not an array, it is treated as an empty array — all required keys are reported missing.
+- If `context` is `null` or not an array, it is treated as an empty array - all required keys are reported missing.
 - Pairs naturally with context resolvers: use `ContextPolicy` to enforce that enrichment actually happened before persistence.
 
 ## Enabling policies
@@ -188,11 +188,11 @@ All built-in policies are commented out in `config/chronicle.php`. Uncomment any
     ActorPresenceValidator::class,
     // ...
 
-    // Optional context resolvers — uncomment to enable:
+    // Optional context resolvers - uncomment to enable:
     // \Chronicle\Context\EnvironmentContextResolver::class,
     // \Chronicle\Context\RequestContextResolver::class,
 
-    // Optional policies — uncomment to enable:
+    // Optional policies - uncomment to enable:
     \Chronicle\Policy\OnlyAuthenticatedUsersPolicy::class,
     \Chronicle\Policy\AllowedActionsPolicy::class,
     \Chronicle\Policy\ForbiddenActionsPolicy::class,
@@ -268,7 +268,7 @@ abstract class AbstractPolicy implements EntryExtension, EntryPolicy
 }
 ```
 
-`stage()` and `process()` are sealed — concrete policies only implement `enforce()`. This prevents accidentally running in the wrong stage or bypassing the enforcement contract.
+`stage()` and `process()` are sealed - concrete policies only implement `enforce()`. This prevents accidentally running in the wrong stage or bypassing the enforcement contract.
 
 Services required by a policy (cache, config, external APIs) are injected via the constructor.
 
@@ -280,4 +280,4 @@ Within the `POLICY` stage, ordering follows the standard extension rules:
 2. Class name (alphabetical)
 3. Registration order
 
-For most applications, ordering between policies matters only when both `AllowedActionsPolicy` and `ForbiddenActionsPolicy` are active — but since both throw on rejection, order affects only which exception the caller sees first, not whether the entry is rejected.
+For most applications, ordering between policies matters only when both `AllowedActionsPolicy` and `ForbiddenActionsPolicy` are active - but since both throw on rejection, order affects only which exception the caller sees first, not whether the entry is rejected.

@@ -22,7 +22,7 @@ Laravel package discovery will register `Chronicle\ChronicleServiceProvider` aut
 
 ## Publish config and migrations
 
-Chronicle ships with an install command that publishes both the config file and the migration set:
+Chronicle ships with an installation command that publishes both the config file and the migration set:
 
 ```bash
 php artisan chronicle:install

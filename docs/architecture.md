@@ -13,7 +13,7 @@ Developer API
 ↓
 Entry Builder
 ↓
-Extension Pipeline (VALIDATE → RESOLVE_CONTEXT → POLICY → PROCESS)
+Extension Pipeline (VALIDATE -> RESOLVE_CONTEXT -> POLICY -> PROCESS)
 ↓
 Canonical Payload Serializer
 ↓
@@ -30,7 +30,7 @@ Checkpoint / Verification / Export Tooling
 
 1. Application code starts an entry with `Chronicle::record()`
 2. `EntryBuilder` validates the required fields and assembles the payload
-3. The extension pipeline runs — built-in validators reject invalid entries before anything is written
+3. The extension pipeline runs - built-in validators reject invalid entries before anything is written
 4. The payload is canonicalized into deterministic JSON
 5. Chronicle computes a payload hash
 6. Chronicle computes the next chain hash from the previous chain head and the payload hash
@@ -93,10 +93,10 @@ Chronicle resolves persistence through the configured storage driver.
 
 Built-in drivers:
 
-- `eloquent` / `database` — synchronous write via the database layer (default)
-- `queued` — asynchronous write dispatched to a single-worker queue
-- `array` — in-memory, for testing
-- `null` — discards entries silently
+- `eloquent` / `database` - synchronous write via the database layer (default)
+- `queued` - asynchronous write dispatched to a single-worker queue
+- `array` - in-memory, for testing
+- `null` - discards entries silently
 
 Most production installations use `eloquent`. See [Storage Drivers](./storage-drivers.md) for the constraints that apply to `queued`.
 

@@ -46,8 +46,17 @@ Chronicle::record()
     ->commit();
 ```
 
+## The Chronicle ecosystem
+
+Chronicle's core is `laravel-chronicle/core`. Optional packages extend it:
+
+- **[Filament plugin](./filament-installation.md)** (`laravel-chronicle/filament`) - a read-only Filament panel to browse and cryptographically verify the ledger.
+- **[AWS KMS adapter](./kms-aws.md)** (`laravel-chronicle/kms-aws`) - sign checkpoints and exports with a key that never leaves AWS KMS.
+- **[S3 Object Lock adapter](./anchor-s3.md)** (`laravel-chronicle/anchor-s3`) - anchor checkpoints to write-once (WORM) S3 objects an attacker can't rewrite.
+
 ## What to read next
 
 - [Installation](./installation.md) to install the package and publish assets
 - [Quick Start](./quick-start.md) to record entries, query the ledger, and verify integrity
 - [Config Reference](./config-reference.md) to understand every `chronicle.php` option
+- [Filament Plugin](./filament-installation.md) to browse and verify the ledger from your admin panel

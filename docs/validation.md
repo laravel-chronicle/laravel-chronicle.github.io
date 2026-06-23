@@ -8,7 +8,7 @@ Chronicle ships with a built-in validation layer that runs before entries are ha
 
 ## How it works
 
-Validation is not a separate pipeline. Validators are extensions registered at the `VALIDATE` stage — the first stage to run, before `RESOLVE_CONTEXT`, `POLICY`, and `PROCESS`. They use negative priorities so they execute before any other extensions you register.
+Validation is not a separate pipeline. Validators are extensions registered at the `VALIDATE` stage - the first stage to run, before `RESOLVE_CONTEXT`, `POLICY`, and `PROCESS`. They use negative priorities, so they execute before any other extensions you register.
 
 ```text
 VALIDATE stage
@@ -31,24 +31,24 @@ POLICY stage
 PROCESS stage
 ↓  your extensions...
 ↓
-CanonicalizePayload → HashPayload → ChainHashEntry → PersistEntry
+CanonicalizePayload -> HashPayload -> ChainHashEntry -> PersistEntry
 ```
 
 If any validator throws, the entry is rejected and nothing is written to the ledger.
 
 ## Built-in validators
 
-| Validator | What it checks | Throws |
-|-----------|----------------|--------|
-| `ActorPresenceValidator` | `actor_type` and `actor_id` are non-blank strings | `MissingActorException` |
-| `SubjectValidator` | `subject_type` and `subject_id` are present (waived for `actor_type = 'system'`) | `MissingSubjectException` |
-| `ActionValidator` | `action` is a string, uses dot notation, within max length | `InvalidActionException` |
-| `CorrelationValidator` | `correlation_id`, when set, is a non-blank string within max length | `InvalidCorrelationIdException` |
-| `TagLimitValidator` | Number of tags does not exceed the configured limit | `InvalidTagsException` |
-| `TagsValidator` | Each tag is a non-empty, unique string within max length | `InvalidTagsException` |
-| `DiffStructureValidator` | Diff has `{key: {old: X, new: Y}}` shape; values are serializable | `InvalidDiffException` |
+| Validator                      | What it checks                                                                                  | Throws                           |
+|--------------------------------|-------------------------------------------------------------------------------------------------|----------------------------------|
+| `ActorPresenceValidator`       | `actor_type` and `actor_id` are non-blank strings                                               | `MissingActorException`          |
+| `SubjectValidator`             | `subject_type` and `subject_id` are present (waived for `actor_type = 'system'`)                | `MissingSubjectException`        |
+| `ActionValidator`              | `action` is a string, uses dot notation, within max length                                      | `InvalidActionException`         |
+| `CorrelationValidator`         | `correlation_id`, when set, is a non-blank string within max length                             | `InvalidCorrelationIdException`  |
+| `TagLimitValidator`            | Number of tags does not exceed the configured limit                                             | `InvalidTagsException`           |
+| `TagsValidator`                | Each tag is a non-empty, unique string within max length                                        | `InvalidTagsException`           |
+| `DiffStructureValidator`       | Diff has `{key: {old: X, new: Y}}` shape; values are serializable                               | `InvalidDiffException`           |
 | `PayloadSerializableValidator` | `metadata`, `context`, and `diff` contain no closures, resources, objects, or non-finite floats | `UnserializablePayloadException` |
-| `PayloadSizeValidator` | Combined serialized byte size of `metadata`, `context`, and `diff` is within the limit | `InvalidPayloadSizeException` |
+| `PayloadSizeValidator`         | Combined serialized byte size of `metadata`, `context`, and `diff` is within the limit          | `InvalidPayloadSizeException`    |
 
 ## Enabling and disabling validators
 
@@ -102,13 +102,13 @@ The `validation` block in `config/chronicle.php` controls the configurable limit
 ],
 ```
 
-| Key | Environment variable | Default | Description |
-|-----|----------------------|---------|-------------|
-| `action_max_length` | `CHRONICLE_ACTION_MAX_LENGTH` | `255` | Maximum byte length of the `action` string |
-| `tag_max_length` | `CHRONICLE_TAG_MAX_LENGTH` | `50` | Maximum character length of a single tag (measured in UTF-8 characters) |
-| `tag_limit` | `CHRONICLE_TAG_LIMIT` | `10` | Maximum number of tags per entry |
-| `correlation_id_max_length` | `CHRONICLE_CORRELATION_ID_MAX_LENGTH` | `255` | Maximum character length of a `correlation_id` (measured in UTF-8 characters) |
-| `max_payload_size` | `CHRONICLE_MAX_PAYLOAD_SIZE` | `65536` | Maximum byte size of the combined serialized `metadata`, `context`, and `diff` (64 KB) |
+| Key                         | Environment variable                  | Default   | Description                                                                            |
+|-----------------------------|---------------------------------------|-----------|----------------------------------------------------------------------------------------|
+| `action_max_length`         | `CHRONICLE_ACTION_MAX_LENGTH`         | `255`     | Maximum byte length of the `action` string                                             |
+| `tag_max_length`            | `CHRONICLE_TAG_MAX_LENGTH`            | `50`      | Maximum character length of a single tag (measured in UTF-8 characters)                |
+| `tag_limit`                 | `CHRONICLE_TAG_LIMIT`                 | `10`      | Maximum number of tags per entry                                                       |
+| `correlation_id_max_length` | `CHRONICLE_CORRELATION_ID_MAX_LENGTH` | `255`     | Maximum character length of a `correlation_id` (measured in UTF-8 characters)          |
+| `max_payload_size`          | `CHRONICLE_MAX_PAYLOAD_SIZE`          | `65536`   | Maximum byte size of the combined serialized `metadata`, `context`, and `diff` (64 KB) |
 
 ### Action format
 
@@ -199,17 +199,17 @@ Chronicle::extendEntry(\App\Chronicle\RequireRequestIdValidator::class);
 
 If ordering relative to other extensions in the `VALIDATE` stage matters, implement `Chronicle\Contracts\PrioritizedEntryExtension` and return a priority value from `priority()`. Lower values run earlier.
 
-| Range | Meaning |
-|-------|---------|
-| below `-200` | Runs before all built-in validators |
+| Range           | Meaning                              |
+|-----------------|--------------------------------------|
+| below `-200`    | Runs before all built-in validators  |
 | `-200` to `-40` | Interleaved with built-in validators |
-| `0` and above | Runs after all built-in validators |
+| `0` and above   | Runs after all built-in validators   |
 
 Without `PrioritizedEntryExtension`, the extension sorts after all prioritized ones within the same stage.
 
 ### Throwing the right exception
 
-Chronicle's built-in validators each throw a dedicated exception class. For custom validators, any `Throwable` propagates up and aborts the commit — Chronicle does not catch or wrap it. Use a domain-specific exception class so callers can distinguish validation rejections from infrastructure failures.
+Chronicle's built-in validators each throw a dedicated exception class. For custom validators, any `Throwable` propagates up and aborts the commit - Chronicle does not catch or wrap it. Use a domain-specific exception class so callers can distinguish validation rejections from infrastructure failures.
 
 ## Relation to `EntryBuilder` validation
 

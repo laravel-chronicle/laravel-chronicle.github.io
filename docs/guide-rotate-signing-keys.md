@@ -22,11 +22,11 @@ Fix any failures before continuing. Rotation on a broken chain will not repair i
 php artisan chronicle:key:generate --id=my-key-2026
 ```
 
-The command prints a base64-encoded private key, a public key, and a ready-to-paste `signing.keys` config entry. Store the private key in your secret manager immediately — it is not saved anywhere by the command.
+The command prints a base64-encoded private key, a public key, and a ready-to-paste `signing.keys` config entry. Store the private key in your secret manager immediately - it is not saved anywhere by the command.
 
 ## 2. Add the new key to `signing.keys` (without activating it)
 
-Copy the printed entry into `config/chronicle.php`. Keep the old key exactly as-is — do not remove it yet:
+Copy the printed entry into `config/chronicle.php`. Keep the old key exactly as-is - do not remove it yet:
 
 ```php
 'signing' => [
@@ -39,7 +39,7 @@ Copy the printed entry into `config/chronicle.php`. Keep the old key exactly as-
             'private_key' => env('CHRONICLE_PRIVATE_KEY'),
             'public_key'  => env('CHRONICLE_PUBLIC_KEY'),
         ],
-        // New key added — not yet active
+        // New key added - not yet active
         'my-key-2026' => [
             'provider'    => \Chronicle\Signing\Ed25519SigningProvider::class,
             'algorithm'   => 'ed25519',
@@ -50,7 +50,7 @@ Copy the printed entry into `config/chronicle.php`. Keep the old key exactly as-
 ],
 ```
 
-Set `CHRONICLE_NEW_PRIVATE_KEY` and `CHRONICLE_NEW_PUBLIC_KEY` in your secrets manager and deploy this config change. The active key has not changed — this deploy is safe.
+Set `CHRONICLE_NEW_PRIVATE_KEY` and `CHRONICLE_NEW_PUBLIC_KEY` in your secrets manager and deploy this config change. The active key has not changed - this deploy is safe.
 
 ## 3. Create the boundary checkpoint and get the activation instruction
 
@@ -89,14 +89,14 @@ php artisan chronicle:verify
 php artisan chronicle:key:list
 ```
 
-The full ledger — including checkpoints created before rotation under `chronicle-dev-key` — should verify cleanly because the old public key is still in the ring.
+The full ledger - including checkpoints created before rotation under `chronicle-dev-key` - should verify cleanly because the old public key is still in the ring.
 
 ## 6. Retire the old private key
 
 Once you have confirmed integrity, remove `private_key` from the old key's config entry:
 
 ```php
-// Retired — private key removed, public key retained for historic verification
+// Retired - private key removed, public key retained for historic verification
 'chronicle-dev-key' => [
     'provider'   => \Chronicle\Signing\Ed25519SigningProvider::class,
     'algorithm'  => 'ed25519',
@@ -111,7 +111,7 @@ Once you have confirmed integrity, remove `private_key` from the old key's confi
 
 ## See also
 
-- [Signing & Keys](./signing-and-keys.md) — key ring config and verification behaviour
-- [Artisan Commands](./artisan-commands.md) — full `chronicle:key:*` reference
-- [Checkpoints](./checkpoints.md) — what the boundary checkpoint stores
-- [Security Model](./security-model.md) — what rotation does and does not guarantee
+- [Signing & Keys](./signing-and-keys.md) - key ring config and verification behaviour
+- [Artisan Commands](./artisan-commands.md) - full `chronicle:key:*` reference
+- [Checkpoints](./checkpoints.md) - what the boundary checkpoint stores
+- [Security Model](./security-model.md) - what rotation does and does not guarantee

@@ -18,19 +18,19 @@ interface SigningProvider
 }
 ```
 
-| Method | Description |
-|---|---|
-| `sign(string $payload)` | Sign the payload; return a base64-encoded signature consistent with `verify()` |
-| `verify(string $payload, string $signature)` | Return `true` if the signature is valid for the payload |
-| `algorithm()` | Stable identifier stored in every checkpoint and export artifact (e.g. `'ed25519'`, `'ecdsa-p256'`) |
-| `keyId()` | Key identifier written into artifacts; Chronicle uses this together with `algorithm()` to route verification |
+| Method                                       | Description                                                                                                  |
+|----------------------------------------------|--------------------------------------------------------------------------------------------------------------|
+| `sign(string $payload)`                      | Sign the payload; return a base64-encoded signature consistent with `verify()`                               |
+| `verify(string $payload, string $signature)` | Return `true` if the signature is valid for the payload                                                      |
+| `algorithm()`                                | Stable identifier stored in every checkpoint and export artifact (e.g. `'ed25519'`, `'ecdsa-p256'`)          |
+| `keyId()`                                    | Key identifier written into artifacts; Chronicle uses this together with `algorithm()` to route verification |
 
 ## Built-in providers
 
-| Provider class | `algorithm()` | Key format | Notes |
-|---|---|---|---|
-| `Chronicle\Signing\Ed25519SigningProvider` | `'ed25519'` | Base64-encoded binary (64-byte private, 32-byte public) | Default. Requires `ext-sodium`. |
-| `Chronicle\Signing\EcdsaSigningProvider` | `'ecdsa-p256'` | PEM strings | Built-in since v1.10. Requires `ext-openssl`. Verify-only if `private_key` is omitted. |
+| Provider class                             | `algorithm()`   | Key format                                              | Notes                                                                                  |
+|--------------------------------------------|-----------------|---------------------------------------------------------|----------------------------------------------------------------------------------------|
+| `Chronicle\Signing\Ed25519SigningProvider` | `'ed25519'`     | Base64-encoded binary (64-byte private, 32-byte public) | Default. Requires `ext-sodium`.                                                        |
+| `Chronicle\Signing\EcdsaSigningProvider`   | `'ecdsa-p256'`  | PEM strings                                             | Built-in since v1.10. Requires `ext-openssl`. Verify-only if `private_key` is omitted. |
 
 ## Constructor convention: array config
 
@@ -87,7 +87,7 @@ class VaultSigningProvider extends LocalVerifyProvider
 
     protected function cachedPublicKeyPem(): string
     {
-        // PEM stored in config at deploy time — never fetched from Vault at runtime
+        // PEM stored in config at deploy time - never fetched from Vault at runtime
         return (string) ($this->config['public_key'] ?? '');
     }
 }
@@ -126,6 +126,10 @@ $this->app->singleton(VaultClient::class, fn () => new VaultClient(
 
 ## AWS KMS adapter
 
+:::tip
+For the complete guide - including the KEK encryption provider for crypto-shredding, IAM policy, and rotation - see the dedicated [AWS KMS Adapter](./kms-aws.md) page.
+:::
+
 The `laravel-chronicle/kms-aws` package provides `AwsKmsSigningProvider`, an ECDSA P-256 adapter that signs via the KMS `Sign` API (DIGEST mode) and verifies locally via `LocalVerifyProvider`.
 
 Install it:
@@ -152,7 +156,7 @@ use Chronicle\KmsAws\AwsKmsSigningProvider;
 ],
 ```
 
-The private key never leaves AWS KMS. Verification is always offline — no AWS API call at verify time.
+The private key never leaves AWS KMS. Verification is always offline - no AWS API call at verify time.
 
 Required IAM actions on the KMS key: `kms:Sign`, `kms:DescribeKey`.
 
@@ -167,16 +171,16 @@ aws kms get-public-key \
 
 ## Algorithm identifier conventions
 
-Pick a stable, descriptive string. Chronicle writes it into every checkpoint and export artifact. The `KeyRing` uses `(algorithm, key_id)` to route verification to the correct provider — do not change an identifier once artifacts have been created under it.
+Pick a stable, descriptive string. Chronicle writes it into every checkpoint and export artifact. The `KeyRing` uses `(algorithm, key_id)` to route verification to the correct provider - do not change an identifier once artifacts have been created under it.
 
-| Identifier | Provider | Notes |
-|---|---|---|
-| `'ed25519'` | `Ed25519SigningProvider` | Default |
+| Identifier     | Provider                                        | Notes                  |
+|----------------|-------------------------------------------------|------------------------|
+| `'ed25519'`    | `Ed25519SigningProvider`                        | Default                |
 | `'ecdsa-p256'` | `EcdsaSigningProvider`, `AwsKmsSigningProvider` | NIST P-256 / secp256r1 |
 
 ## See also
 
-- [Signing & Keys](./signing-and-keys.md) — key ring config, key generation, and rotation workflow
-- [Security Model](./security-model.md) — what rotation does and does not guarantee
-- [Checkpoints](./checkpoints.md) — what gets signed at checkpoint time
-- [Export Format](./export-format.md) — `signature.json` structure
+- [Signing & Keys](./signing-and-keys.md) - key ring config, key generation, and rotation workflow
+- [Security Model](./security-model.md) - what rotation does and does not guarantee
+- [Checkpoints](./checkpoints.md) - what gets signed at checkpoint time
+- [Export Format](./export-format.md) - `signature.json` structure

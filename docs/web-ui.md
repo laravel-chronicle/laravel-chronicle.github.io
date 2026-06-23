@@ -4,7 +4,7 @@ title: Read-Only Web UI
 
 # Read-Only Web UI
 
-Chronicle ships an optional Blade-based interface for browsing the audit ledger in a browser. It is **read-only** — no Chronicle data can be created, modified, or deleted through it.
+Chronicle ships an optional Blade-based interface for browsing the audit ledger in a browser. It is **read-only** - no Chronicle data can be created, modified, or deleted through it.
 
 ## Enabling the UI
 
@@ -27,11 +27,11 @@ The interface is disabled by default. Until `enabled` is `true`, all UI routes r
 
 ## Routes
 
-| Route name | URL (default prefix) | Description |
-|---|---|---|
-| `chronicle.entries.index` | `GET /chronicle` | Paginated entry list with filters |
-| `chronicle.entries.show` | `GET /chronicle/entries/{id}` | Single entry detail |
-| `chronicle.stats` | `GET /chronicle/stats` | Ledger statistics and activity chart |
+| Route name                | URL (default prefix)          | Description                          |
+|---------------------------|-------------------------------|--------------------------------------|
+| `chronicle.entries.index` | `GET /chronicle`              | Paginated entry list with filters    |
+| `chronicle.entries.show`  | `GET /chronicle/entries/{id}` | Single entry detail                  |
+| `chronicle.stats`         | `GET /chronicle/stats`        | Ledger statistics and activity chart |
 
 The prefix defaults to `chronicle` and is configurable via `CHRONICLE_UI_PREFIX`.
 
@@ -39,16 +39,16 @@ The prefix defaults to `chronicle` and is configurable via `CHRONICLE_UI_PREFIX`
 
 The index view accepts these query parameters:
 
-| Parameter | Description |
-|---|---|
-| `action` | Filter by exact action string |
-| `actor_id` | Filter by actor id |
-| `subject_type` | Filter by subject type |
-| `subject_id` | Filter by subject id |
-| `tag` | Filter by a single tag (JSON containment) |
-| `from` | Start date (`Y-m-d`, UTC) |
-| `to` | End date (`Y-m-d`, UTC) |
-| `sort` | `asc` or `desc` (default `desc`) |
+| Parameter      | Description                               |
+|----------------|-------------------------------------------|
+| `action`       | Filter by exact action string             |
+| `actor_id`     | Filter by actor id                        |
+| `subject_type` | Filter by subject type                    |
+| `subject_id`   | Filter by subject id                      |
+| `tag`          | Filter by a single tag (JSON containment) |
+| `from`         | Start date (`Y-m-d`, UTC)                 |
+| `to`           | End date (`Y-m-d`, UTC)                   |
+| `sort`         | `asc` or `desc` (default `desc`)          |
 
 ## Access control
 
@@ -70,7 +70,7 @@ Gate::define('view-chronicle', fn ($user) => $user->isAdmin());
 
 To allow any authenticated user, change the middleware to `['web', 'auth']`.
 
-Note: `middleware` is a plain PHP array — it cannot be driven by an environment variable. Add middleware class names or aliases directly in the config file.
+Note: `middleware` is a plain PHP array - it cannot be driven by an environment variable. Add middleware class names or aliases directly in the config file.
 
 ## Pagination
 

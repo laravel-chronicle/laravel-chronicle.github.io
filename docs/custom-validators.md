@@ -4,7 +4,7 @@ title: Custom Validators
 
 # Custom Validators
 
-Validators run at `ExtensionStage::VALIDATE` (priority 100) — the earliest point in the pipeline — and reject entries before any hashing or persistence occurs.
+Validators run at `ExtensionStage::VALIDATE` (priority 100) - the earliest point in the pipeline - and reject entries before any hashing or persistence occurs.
 
 ## The pattern
 
@@ -54,11 +54,11 @@ class MissingTenantException extends ChronicleException {}
 
 The built-in validators (e.g. `ActionValidator`) use `priority = -100`, which means they run first within the `VALIDATE` stage. Set your validator's priority to `0` or higher to run after them:
 
-| Priority | Who |
-|---|---|
-| `-100` | Built-in validators (`ActionValidator`, etc.) |
+| Priority      | Who                                                              |
+|---------------|------------------------------------------------------------------|
+| `-100`        | Built-in validators (`ActionValidator`, etc.)                    |
 | `0` (default) | Your validators (if `PrioritizedEntryExtension` not implemented) |
-| positive | Runs later |
+| positive      | Runs later                                                       |
 
 ## Reading config values
 
@@ -95,12 +95,12 @@ Chronicle::extendEntry(RequiresTenantContextValidator::class);
 
 When a validator throws, Chronicle:
 
-1. Aborts the pipeline — the entry is never canonicalized, hashed, or persisted
+1. Aborts the pipeline - the entry is never canonicalized, hashed, or persisted
 2. Dispatches `EntryRejected($exception, $rawPayload)`
 3. Re-throws the exception to the caller
 
 ## See also
 
-- [Extension Architecture](./extending-chronicle.md) — stage ordering and `PendingEntry` API
-- [Validation](./validation.md) — built-in validators and their config keys
-- [Events Reference](./events.md) — `EntryRejected` payload
+- [Extension Architecture](./extending-chronicle.md) - stage ordering and `PendingEntry` API
+- [Validation](./validation.md) - built-in validators and their config keys
+- [Events Reference](./events.md) - `EntryRejected` payload

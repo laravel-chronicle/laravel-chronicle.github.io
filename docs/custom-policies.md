@@ -4,7 +4,7 @@ title: Custom Policies
 
 # Custom Policies
 
-Policies enforce business rules at `ExtensionStage::POLICY` (priority 300) — after validation and context resolution, before canonicalization. They either allow an entry to proceed (return normally) or reject it (throw `PolicyViolationException`).
+Policies enforce business rules at `ExtensionStage::POLICY` (priority 300) - after validation and context resolution, before canonicalization. They either allow an entry to proceed (return normally) or reject it (throw `PolicyViolationException`).
 
 ## The pattern
 
@@ -30,7 +30,7 @@ class RequiresBusinessHoursPolicy extends AbstractPolicy
 }
 ```
 
-`AbstractPolicy` fixes `stage()` to `ExtensionStage::POLICY` and wires `process()` to call `enforce()` — both methods are `final` so you cannot accidentally change the stage or break the pipeline contract.
+`AbstractPolicy` fixes `stage()` to `ExtensionStage::POLICY` and wires `process()` to call `enforce()` - both methods are `final` so you cannot accidentally change the stage or break the pipeline contract.
 
 ## Accessing entry data
 
@@ -98,6 +98,6 @@ class RequiresBusinessHoursPolicy extends AbstractPolicy implements PrioritizedE
 
 ## See also
 
-- [Extension Architecture](./extending-chronicle.md) — stage ordering and registration
-- [Policies](./policies.md) — built-in policies and their config keys
-- [Events Reference](./events.md) — `EntryRejected` fires when a policy rejects
+- [Extension Architecture](./extending-chronicle.md) - stage ordering and registration
+- [Policies](./policies.md) - built-in policies and their config keys
+- [Events Reference](./events.md) - `EntryRejected` fires when a policy rejects

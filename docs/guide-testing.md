@@ -20,7 +20,7 @@ it('records an order created entry', function () {
 });
 ```
 
-`fake()` flushes any entries from previous tests, swaps the driver to `ArrayDriver`, and returns a `ChronicleAssertions` helper. All validation and hashing still runs — only persistence is redirected to memory.
+`fake()` flushes any entries from previous tests, swaps the driver to `ArrayDriver`, and returns a `ChronicleAssertions` helper. All validation and hashing still runs - only persistence is redirected to memory.
 
 ## 2. Assert what was recorded
 
@@ -82,7 +82,7 @@ it('records order updated with diff', function () {
 
 ## Verify it worked
 
-Run your test suite — a failing `assertRecorded()` prints a clear message:
+Run your test suite - a failing `assertRecorded()` prints a clear message:
 
 ```
 Failed asserting that a Chronicle entry matching the filter was recorded.
@@ -90,5 +90,5 @@ Failed asserting that a Chronicle entry matching the filter was recorded.
 
 ## See also
 
-- [Testing Helpers](./testing-helpers.md) — full `ChronicleAssertions` API reference
-- [Auditing Eloquent Models](./auditing-eloquent-models.md) — testing model-triggered entries
+- [Testing Helpers](./testing-helpers.md) - full `ChronicleAssertions` API reference
+- [Auditing Eloquent Models](./auditing-eloquent-models.md) - testing model-triggered entries

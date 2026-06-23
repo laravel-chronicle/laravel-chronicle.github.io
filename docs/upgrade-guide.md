@@ -16,7 +16,7 @@ Chronicle's public API and export format are versioned and stable within a major
 
 Three new top-level keys were added to `config/chronicle.php`. If you published the config before 1.9, add them manually:
 
-**`queue`** — required when using `driver = 'queued'`:
+**`queue`** - required when using `driver = 'queued'`:
 
 ```php
 'queue' => [
@@ -25,7 +25,7 @@ Three new top-level keys were added to `config/chronicle.php`. If you published 
 ],
 ```
 
-**`prune`** — used by `chronicle:prune`:
+**`prune`** - used by `chronicle:prune`:
 
 ```php
 'prune' => [
@@ -34,7 +34,7 @@ Three new top-level keys were added to `config/chronicle.php`. If you published 
 ],
 ```
 
-**`ui`** — used by the read-only web interface:
+**`ui`** - used by the read-only web interface:
 
 ```php
 'ui' => [
@@ -45,13 +45,13 @@ Three new top-level keys were added to `config/chronicle.php`. If you published 
 ],
 ```
 
-If these keys are absent, Chronicle falls back to defaults — but you will not be able to configure them via environment variables without publishing the updated config.
+If these keys are absent, Chronicle falls back to defaults - but you will not be able to configure them via environment variables without publishing the updated config.
 
 ---
 
 ## Upgrading to 1.11
 
-1.11 is additive. A 1.10 ledger with anchoring disabled and no incremental flags verifies **identically** to 1.10 — no artifact format change, and no re-export is needed.
+1.11 is additive. A 1.10 ledger with anchoring disabled and no incremental flags verifies **identically** to 1.10 - no artifact format change, and no re-export is needed.
 
 ### 1. Run the migration
 
@@ -62,11 +62,11 @@ php artisan chronicle:install --force   # re-publish config + migrations (only i
 php artisan migrate
 ```
 
-If you never published the migrations, they load from the package automatically — just run `php artisan migrate`.
+If you never published the migrations, they load from the package automatically - just run `php artisan migrate`.
 
 ### 2. Backfill historical checkpoints
 
-New checkpoints populate the range columns and `checkpoint_id` automatically. Backfill checkpoints created under 1.10 once — it is chunked and idempotent:
+New checkpoints populate the range columns and `checkpoint_id` automatically. Backfill checkpoints created under 1.10 once - it is chunked and idempotent:
 
 ```bash
 php artisan chronicle:checkpoints:backfill --dry-run   # preview
@@ -77,7 +77,7 @@ Until a ledger is backfilled, the incremental verification modes fall back to a 
 
 ### 3. checkpoint_id is now populated on creation
 
-1.10 left `checkpoint_id` unpopulated; 1.11 stamps it onto the entries a checkpoint covers at creation time (and the backfill does the same for history). **`checkpoint_id` is not part of any hashed payload** — populating it does not change any `payload_hash` or `chain_hash`, so existing signatures and exports remain valid.
+1.10 left `checkpoint_id` unpopulated; 1.11 stamps it onto the entries a checkpoint covers at creation time (and the backfill does the same for history). **`checkpoint_id` is not part of any hashed payload** - populating it does not change any `payload_hash` or `chain_hash`, so existing signatures and exports remain valid.
 
 ### 4. Anchoring is opt-in
 
@@ -101,7 +101,7 @@ Add an `anchoring` block and the two new table keys to a previously-published `c
 
 ## Deprecations
 
-### `EntryBuilder::modelChanges()` → `modelDiff()`
+### `EntryBuilder::modelChanges()` -> `modelDiff()`
 
 `modelChanges()` is deprecated since 1.x and **will be removed in 2.0**.
 
@@ -127,9 +127,22 @@ Chronicle::record()
 
 The two methods are functionally identical. `modelChanges()` triggers an `E_USER_DEPRECATED` notice and delegates to `modelDiff()`.
 
+## Upgrading to 1.13
+
+1.13 is **additive and fully backward-compatible**. With the new config keys unset, behaviour is byte-for-byte identical to 1.12 - no migration, no artifact format change, no re-export.
+
+What's new and entirely opt-in:
+
+- **`models.entry`** - point Chronicle at a subclass of `Chronicle\Entry\Entry`. See [Custom Entry Model](./custom-entry-model.md).
+- **`verifyEntryRange` / `chronicle:verify --from --to`** - verify an arbitrary entry span, anchored on the enclosing signed checkpoints. See [Scalable Verification](./scalable-verification.md#verify-an-entry-range).
+- **Reverse reference resolution** - `Chronicle::resolveReference()` / `referenceLabel()` / `referenceModel()`, plus `references.label_attribute`. See [Reference Resolution](./reference-resolution.md#reverse-resolution).
+- **`Chronicle\Testing\LedgerSeeder`** - seed a verifiable ledger in tests. See [Testing Helpers](./testing-helpers.md#seeding-a-verifiable-ledger-v113).
+
+No action is required to adopt 1.13; reach for each feature when you need it.
+
 ---
 
 ## See also
 
-- [Recording Entries](./recording-entries.md) — full `EntryBuilder` API
-- [Config Reference](./config-reference.md) — all config keys with defaults
+- [Recording Entries](./recording-entries.md) - full `EntryBuilder` API
+- [Config Reference](./config-reference.md) - all config keys with defaults

@@ -70,7 +70,7 @@ Chronicle::transaction(function ($transaction) use ($user, $order) {
 });
 ```
 
-Entries created inside the transaction share a generated correlation root so you can query them later.
+Entries created inside the transaction share a generated correlation root, so you can query them later.
 
 ## 4. Read from the ledger
 

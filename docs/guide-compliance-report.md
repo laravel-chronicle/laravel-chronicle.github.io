@@ -26,7 +26,7 @@ php artisan chronicle:report /tmp/chronicle-report-q1.html \
     --to=2025-03-31
 ```
 
-The command writes a single HTML file. On success it prints:
+The command writes a single HTML file. On success, it prints:
 
 ```
 Entries:    4 821
@@ -58,7 +58,7 @@ openssl pkeyutl -verify -inkey pub.bin -keyform DER -sigfile sig.bin -in hash.bi
 
 ## Verify it worked
 
-Open the HTML file in a browser — it renders a table with all report fields. Confirm the period, entry count, and chain head match what you expect from `chronicle:stats`.
+Open the HTML file in a browser - it renders a table with all report fields. Confirm the period, entry count, and chain head match what you expect from `chronicle:stats`.
 
 ```bash
 php artisan chronicle:stats
@@ -66,6 +66,6 @@ php artisan chronicle:stats
 
 ## See also
 
-- [Compliance Reports](./compliance-reports.md) — report fields, signing, and verification details
-- [Checkpoints](./checkpoints.md) — why to checkpoint before reporting
-- [Signing & Keys](./signing-and-keys.md) — public key management
+- [Compliance Reports](./compliance-reports.md) - report fields, signing, and verification details
+- [Checkpoints](./checkpoints.md) - why to checkpoint before reporting
+- [Signing & Keys](./signing-and-keys.md) - public key management

@@ -4,7 +4,7 @@ title: Custom Context Resolvers
 
 # Custom Context Resolvers
 
-Context resolvers run at `ExtensionStage::RESOLVE_CONTEXT` (priority 200) and automatically attach namespaced runtime data to an entry's `context` attribute. Return `null` to skip silently — the resolver is simply not applied to that entry.
+Context resolvers run at `ExtensionStage::RESOLVE_CONTEXT` (priority 200) and automatically attach namespaced runtime data to an entry's `context` attribute. Return `null` to skip silently - the resolver is simply not applied to that entry.
 
 ## The pattern
 
@@ -30,7 +30,7 @@ class TenantContextResolver extends AbstractContextResolver
         $tenant = $this->tenants->current();
 
         if ($tenant === null) {
-            return null; // skip — no tenant in this context
+            return null; // skip - no tenant in this context
         }
 
         return [
@@ -69,7 +69,7 @@ public function resolve(PendingEntry $entry): ?array
 }
 ```
 
-`AbstractContextResolver::process()` checks for `null` and skips the merge — it does not write an empty array or a `null` value under the key.
+`AbstractContextResolver::process()` checks for `null` and skips the merge - it does not write an empty array or a `null` value under the key.
 
 ## Redacting sensitive values
 
@@ -109,5 +109,5 @@ Chronicle::extendEntry(TenantContextResolver::class);
 
 ## See also
 
-- [Extension Architecture](./extending-chronicle.md) — stage ordering, `PendingEntry` API, registration
-- [Context Resolvers](./context-resolvers.md) — built-in resolvers (request, environment, host, process, queue)
+- [Extension Architecture](./extending-chronicle.md) - stage ordering, `PendingEntry` API, registration
+- [Context Resolvers](./context-resolvers.md) - built-in resolvers (request, environment, host, process, queue)

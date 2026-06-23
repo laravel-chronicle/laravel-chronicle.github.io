@@ -20,10 +20,10 @@ The command writes a single HTML file to the given path. The path is required.
 
 ## Options
 
-| Option | Description |
-|---|---|
+| Option    | Description                                       |
+|-----------|---------------------------------------------------|
 | `--from=` | Start of the reporting period (Y-m-d or ISO 8601) |
-| `--to=` | End of the reporting period (Y-m-d or ISO 8601) |
+| `--to=`   | End of the reporting period (Y-m-d or ISO 8601)   |
 
 Both options are optional. Omitting them includes all entries.
 
@@ -31,16 +31,16 @@ Both options are optional. Omitting them includes all entries.
 
 The generated HTML report contains:
 
-| Field | Description |
-|---|---|
-| Generated at | UTC timestamp of when the report was created |
-| Period | Date range covered (`--from` / `--to`), or "All entries" |
-| Entry count | Number of entries in the period |
-| Chain head | `chain_hash` of the most recent entry in the period |
-| Report hash | SHA-256 of the canonical report data (entry count, boundaries, chain head, period) |
-| Algorithm | Signing algorithm (e.g. `ed25519`) |
-| Key ID | Identifier of the signing key |
-| Signature | Detached signature of the report hash |
+| Field        | Description                                                                        |
+|--------------|------------------------------------------------------------------------------------|
+| Generated at | UTC timestamp of when the report was created                                       |
+| Period       | Date range covered (`--from` / `--to`), or "All entries"                           |
+| Entry count  | Number of entries in the period                                                    |
+| Chain head   | `chain_hash` of the most recent entry in the period                                |
+| Report hash  | SHA-256 of the canonical report data (entry count, boundaries, chain head, period) |
+| Algorithm    | Signing algorithm (e.g. `ed25519`)                                                 |
+| Key ID       | Identifier of the signing key                                                      |
+| Signature    | Detached signature of the report hash                                              |
 
 The report hash is computed over a canonical JSON structure that includes `generated_at`, `entry_count`, `first_entry_id`, `last_entry_id`, `chain_head`, `from`, and `to`. The signature covers that hash using the active `SigningProvider`.
 
@@ -72,6 +72,6 @@ Signature:  base64...
 
 ## See also
 
-- [Exports](./exports.md) — full NDJSON dataset export for independent chain verification
-- [Signing & Keys](./signing-and-keys.md) — key management
-- [Artisan Commands](./artisan-commands.md) — full command reference
+- [Exports](./exports.md) - full NDJSON dataset export for independent chain verification
+- [Signing & Keys](./signing-and-keys.md) - key management
+- [Artisan Commands](./artisan-commands.md) - full command reference

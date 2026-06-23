@@ -40,6 +40,22 @@ The command also reports the entry id where corruption begins.
 
 Chronicle v1.11 adds cheaper, scoped verification modes (`--checkpoints-only`, `--since-last-checkpoint`, `--from-checkpoint`/`--to-checkpoint`, `--resume`) and an external-anchor pass (`--anchors`), each with its own failure reasons (`checkpoint_chain_broken`, `checkpoint_head_mismatch`, `segment_discontinuous`, `anchor_invalid`). See [Scalable Verification](./scalable-verification.md).
 
+## Verifying an entry range (v1.13)
+
+When you have two entries rather than two checkpoints, `verifyEntryRange` verifies the span between them without your having to work out checkpoint bounds:
+
+```php
+use Chronicle\Verification\IntegrityVerifier;
+
+app(IntegrityVerifier::class)->verifyEntryRange($fromSequence, $toSequence);
+```
+
+```bash
+php artisan chronicle:verify --from=<entry-ulid> --to=<entry-ulid>
+```
+
+Chronicle resolves the **signed** checkpoints that enclose the range and recomputes the chain between them, so verification of the requested entries rides on the signed anchors - never on a selected entry's own stored hash. It fails closed if the derived anchors don't actually enclose the range. A range extending past the last checkpoint is recomputed to the head, carrying the same trust as `--since-last-checkpoint`. See [Scalable Verification](./scalable-verification.md#verify-an-entry-range).
+
 ## Why this differs from export verification
 
 `chronicle:verify` validates the live ledger in the source system.

@@ -57,6 +57,6 @@ The logging model is not tied to a specific Laravel runtime path.
 
 Chronicle does not pretend to make your database impossible to tamper with.
 
-Instead it focuses on something more realistic and more useful:
+Instead, it focuses on something more realistic and more useful:
 
 making tampering detectable through deterministic hashing, append-only semantics, checkpoints, and exports.

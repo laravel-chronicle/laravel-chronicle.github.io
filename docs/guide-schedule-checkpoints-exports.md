@@ -4,7 +4,7 @@ title: Schedule Checkpoints & Exports
 
 # Schedule Checkpoints & Exports
 
-Create periodic signed checkpoints and export the ledger on a schedule so you have an off-system audit trail without manual intervention.
+Create periodic signed checkpoints and export the ledger on a schedule, so you have an off-system audit trail without manual intervention.
 
 ## 1. Add to the scheduler
 
@@ -75,6 +75,6 @@ php artisan chronicle:verify-export storage/chronicle/exports/<week-dir>
 
 ## See also
 
-- [Checkpoints](./checkpoints.md) — what a checkpoint stores and why it matters
-- [Exports](./exports.md) — export output format
-- [Artisan Commands](./artisan-commands.md) — full command signatures
+- [Checkpoints](./checkpoints.md) - what a checkpoint stores and why it matters
+- [Exports](./exports.md) - export output format
+- [Artisan Commands](./artisan-commands.md) - full command signatures

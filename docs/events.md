@@ -26,7 +26,7 @@ The fully persisted `Chronicle\Entry\Entry` model.
 
 `EntryRecorded` is dispatched by the `PersistEntry` pipeline stage, which runs at the end of the **synchronous** write path.
 
-**Important:** when `driver = 'queued'`, Chronicle dispatches a `PersistChronicleEntryJob` instead of running the full pipeline. The job calls `ChainHashEntry` and `DatabaseDriver` directly — it does **not** pass through `PersistEntry`. As a result, `EntryRecorded` is **not fired** when using the queued driver.
+**Important:** when `driver = 'queued'`, Chronicle dispatches a `PersistChronicleEntryJob` instead of running the full pipeline. The job calls `ChainHashEntry` and `DatabaseDriver` directly - it does **not** pass through `PersistEntry`. As a result, `EntryRecorded` is **not fired** when using the queued driver.
 
 ### Listening
 
@@ -63,10 +63,10 @@ public readonly Throwable $reason
 public readonly array     $payload
 ```
 
-| Property | Type | Description |
-|---|---|---|
-| `$reason` | `Throwable` | The exception that caused the rejection |
-| `$payload` | `array` | The raw entry attributes at the point of rejection |
+| Property   | Type        | Description                                        |
+|------------|-------------|----------------------------------------------------|
+| `$reason`  | `Throwable` | The exception that caused the rejection            |
+| `$payload` | `array`     | The raw entry attributes at the point of rejection |
 
 ### When it fires
 
@@ -102,6 +102,6 @@ class LogRejectedEntry
 
 ## See also
 
-- [Storage Drivers](./storage-drivers.md) — queued driver behaviour and `EntryRecorded` timing
-- [Validation](./validation.md) — built-in validators that trigger `EntryRejected`
-- [Policies](./policies.md) — built-in policies that trigger `EntryRejected`
+- [Storage Drivers](./storage-drivers.md) - queued driver behaviour and `EntryRecorded` timing
+- [Validation](./validation.md) - built-in validators that trigger `EntryRejected`
+- [Policies](./policies.md) - built-in policies that trigger `EntryRejected`

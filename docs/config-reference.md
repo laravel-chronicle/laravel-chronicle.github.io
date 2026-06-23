@@ -51,10 +51,10 @@ Running multiple workers on this queue will produce chain forks.
 ],
 ```
 
-| Key | Env var | Default | Description |
-|-----|---------|---------|-------------|
+| Key          | Env var                      | Default                           | Description                     |
+|--------------|------------------------------|-----------------------------------|---------------------------------|
 | `connection` | `CHRONICLE_QUEUE_CONNECTION` | `null` (default queue connection) | Laravel queue connection to use |
-| `name` | `CHRONICLE_QUEUE` | `chronicle` | Queue name for Chronicle jobs |
+| `name`       | `CHRONICLE_QUEUE`            | `chronicle`                       | Queue name for Chronicle jobs   |
 
 ## `prune`
 
@@ -67,10 +67,10 @@ Used by `chronicle:prune`. Controls how old entries are retained.
 ],
 ```
 
-| Key | Default | Description |
-|-----|---------|-------------|
-| `default_retention_days` | `null` (disabled) | Entries older than this many days are eligible for pruning |
-| `respect_checkpoints` | `true` | Entries anchored to a checkpoint are protected unless `--force` is passed |
+| Key                      | Default           | Description                                                               |
+|--------------------------|-------------------|---------------------------------------------------------------------------|
+| `default_retention_days` | `null` (disabled) | Entries older than this many days are eligible for pruning                |
+| `respect_checkpoints`    | `true`            | Entries anchored to a checkpoint are protected unless `--force` is passed |
 
 Set `default_retention_days` to `null` to disable time-based pruning entirely.
 
@@ -95,6 +95,26 @@ Overrides the table used for signed checkpoints.
 
 This table stores the checkpoint chain head, entry count, signature metadata, and creation timestamp used to anchor the ledger state at a known moment in time.
 
+## `models.entry`
+
+```php
+'models' => [
+    'entry' => \Chronicle\Entry\Entry::class,
+],
+```
+
+The Eloquent model Chronicle reads and verifies. Point it at a subclass of `Chronicle\Entry\Entry` to add accessors, relationships, casts, or scopes. New in v1.13; honored end-to-end by the query API, the reader, and all verifiers. The class must extend `Chronicle\Entry\Entry` or Chronicle throws `InvalidEntryModelException`. See [Custom Entry Model](./custom-entry-model.md).
+
+## `references.label_attribute`
+
+```php
+'references' => [
+    'label_attribute' => 'name',
+],
+```
+
+The model attribute read for a human label when reverse reference resolution hydrates a record (`Chronicle::referenceLabel(..., hydrate: true)` / `referenceModel()`). Default `name`. New in v1.13. See [Reference Resolution](./reference-resolution.md#reverse-resolution).
+
 ## `signing.active`
 
 The key ID used to sign new checkpoints and exports. Must match a key defined in `signing.keys`.
@@ -107,7 +127,7 @@ The key ID used to sign new checkpoints and exports. Must match a key defined in
 
 ## `signing.enforce_on_boot`
 
-When `true`, Chronicle throws a `RuntimeException` at boot if the active key is missing or misconfigured. Only the active key is validated — retired verify-only keys in the ring are not checked.
+When `true`, Chronicle throws a `RuntimeException` at boot if the active key is missing or misconfigured. Only the active key is validated - retired verify-only keys in the ring are not checked.
 
 ```php
 'enforce_on_boot' => env('CHRONICLE_SIGNING_ENFORCE_ON_BOOT', false),
@@ -133,12 +153,12 @@ The full key ring. Each entry is a named key with its provider class, algorithm,
 ],
 ```
 
-| Key entry field | Description |
-|---|---|
-| `provider` | Class implementing `Chronicle\Contracts\SigningProvider`. |
-| `algorithm` | Stable identifier stored in artifacts (e.g. `'ed25519'`, `'ecdsa-p256'`). |
-| `private_key` | Signing key material. Omit or set to `null` to create a verify-only retired key. |
-| `public_key` | Verification key material. Required for all keys including retired ones. |
+| Key entry field  | Description                                                                      |
+|------------------|----------------------------------------------------------------------------------|
+| `provider`       | Class implementing `Chronicle\Contracts\SigningProvider`.                        |
+| `algorithm`      | Stable identifier stored in artifacts (e.g. `'ed25519'`, `'ecdsa-p256'`).        |
+| `private_key`    | Signing key material. Omit or set to `null` to create a verify-only retired key. |
+| `public_key`     | Verification key material. Required for all keys including retired ones.         |
 
 Retired keys (keys without `private_key`) must remain in `signing.keys` permanently so that historic checkpoints and exports can continue to be verified.
 
@@ -162,11 +182,11 @@ External anchoring of checkpoints. Opt-in; off by default. See [External Anchori
 ],
 ```
 
-| Key | Env | Default | Meaning |
-|---|---|---|---|
-| `anchoring.enabled` | `CHRONICLE_ANCHORING_ENABLED` | `false` | Anchor each new checkpoint after commit |
-| `anchoring.queue` | `CHRONICLE_ANCHORING_QUEUE` | `null` | Queue for the anchoring job (null = default) |
-| `anchoring.providers` | — | `[]` | `name => ['provider' => class, ...config]` |
+| Key                   | Env                           | Default  | Meaning                                      |
+|-----------------------|-------------------------------|----------|----------------------------------------------|
+| `anchoring.enabled`   | `CHRONICLE_ANCHORING_ENABLED` | `false`  | Anchor each new checkpoint after commit      |
+| `anchoring.queue`     | `CHRONICLE_ANCHORING_QUEUE`   | `null`   | Queue for the anchoring job (null = default) |
+| `anchoring.providers` | -                             | `[]`     | `name => ['provider' => class, ...config]`   |
 
 When `enabled`, each new checkpoint is anchored asynchronously with every configured provider after the checkpoint transaction commits. An anchor failure never rolls a checkpoint back.
 
@@ -184,13 +204,13 @@ Controls the configurable limits enforced by Chronicle's built-in validators.
 ],
 ```
 
-| Key | Default | Description |
-|-----|---------|-------------|
-| `action_max_length` | `255` | Maximum byte length of the `action` string |
-| `tag_max_length` | `50` | Maximum UTF-8 character length of a single tag |
-| `tag_limit` | `10` | Maximum number of tags per entry |
-| `correlation_id_max_length` | `255` | Maximum UTF-8 character length of a `correlation_id` |
-| `max_payload_size` | `65536` | Maximum byte size of the combined serialized `metadata`, `context`, and `diff` (64 KB) |
+| Key                         | Default  | Description                                                                            |
+|-----------------------------|----------|----------------------------------------------------------------------------------------|
+| `action_max_length`         | `255`    | Maximum byte length of the `action` string                                             |
+| `tag_max_length`            | `50`     | Maximum UTF-8 character length of a single tag                                         |
+| `tag_limit`                 | `10`     | Maximum number of tags per entry                                                       |
+| `correlation_id_max_length` | `255`    | Maximum UTF-8 character length of a `correlation_id`                                   |
+| `max_payload_size`          | `65536`  | Maximum byte size of the combined serialized `metadata`, `context`, and `diff` (64 KB) |
 
 See [Validation](./validation) for a full description of each built-in validator.
 
@@ -229,12 +249,12 @@ Chronicle ships an optional read-only Blade interface. It is disabled by default
 ],
 ```
 
-| Key | Env var | Default | Description |
-|-----|---------|---------|-------------|
-| `enabled` | `CHRONICLE_UI_ENABLED` | `false` | Set to `true` to activate the web interface |
-| `prefix` | `CHRONICLE_UI_PREFIX` | `chronicle` | URL prefix for UI routes |
-| `middleware` | *(PHP array, no env var)* | `['web','auth','can:view-chronicle']` | Middleware stack applied to all UI routes |
-| `per_page` | `CHRONICLE_UI_PER_PAGE` | `25` | Entries shown per page on the index |
+| Key          | Env var                   | Default                               | Description                                 |
+|--------------|---------------------------|---------------------------------------|---------------------------------------------|
+| `enabled`    | `CHRONICLE_UI_ENABLED`    | `false`                               | Set to `true` to activate the web interface |
+| `prefix`     | `CHRONICLE_UI_PREFIX`     | `chronicle`                           | URL prefix for UI routes                    |
+| `middleware` | *(PHP array, no env var)* | `['web','auth','can:view-chronicle']` | Middleware stack applied to all UI routes   |
+| `per_page`   | `CHRONICLE_UI_PER_PAGE`   | `25`                                  | Entries shown per page on the index         |
 
 The `can:view-chronicle` gate must be defined in your `AuthServiceProvider`:
 
@@ -244,7 +264,7 @@ Gate::define('view-chronicle', fn ($user) => $user->isAdmin());
 
 To allow any authenticated user, set `middleware` to `['web', 'auth']`.
 
-Note: `middleware` is a plain PHP array and cannot be driven by an environment variable — arbitrary middleware class names require code-level configuration.
+Note: `middleware` is a plain PHP array and cannot be driven by an environment variable - arbitrary middleware class names require code-level configuration.
 
 ## Example production-oriented config
 

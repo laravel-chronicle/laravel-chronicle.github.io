@@ -4,7 +4,7 @@ title: Context Resolvers
 
 # Context Resolvers
 
-Context resolvers automatically attach namespaced runtime information to every Chronicle audit entry — things like the current environment, HTTP request details, server hostname, process ID, or queue job metadata.
+Context resolvers automatically attach namespaced runtime information to every Chronicle audit entry - things like the current environment, HTTP request details, server hostname, process ID, or queue job metadata.
 
 They are opt-in entry extensions that run in the `RESOLVE_CONTEXT` stage, before Chronicle canonicalizes and hashes the entry.
 
@@ -12,17 +12,17 @@ They are opt-in entry extensions that run in the `RESOLVE_CONTEXT` stage, before
 
 A context resolver implements two methods:
 
-- `contextKey()` — the key under which its data is nested inside the entry's `context` attribute.
-- `resolve()` — returns an array of data to attach, or `null` to skip silently.
+- `contextKey()` - the key under which its data is nested inside the entry's `context` attribute.
+- `resolve()` - returns an array of data to attach, or `null` to skip silently.
 
-The `AbstractContextResolver` base class handles the rest: it calls `resolve()`, skips if `null` is returned, and merges the result into `context` under the resolver's key — without overwriting any existing application-set keys.
+The `AbstractContextResolver` base class handles the rest: it calls `resolve()`, skips if `null` is returned, and merges the result into `context` under the resolver's key - without overwriting any existing application-set keys.
 
 ```text
 entry.context before: { "tenant_id": 42 }
 
-EnvironmentContextResolver runs →  context.environment = { name, debug }
-RequestContextResolver runs    →  context.request     = { ip_address, url, ... }
-HostContextResolver runs       →  context.host        = { hostname }
+EnvironmentContextResolver runs ->  context.environment = { name, debug }
+RequestContextResolver runs    ->  context.request     = { ip_address, url, ... }
+HostContextResolver runs       ->  context.host        = { hostname }
 
 entry.context after: {
   "tenant_id": 42,
@@ -38,13 +38,13 @@ All context data is written before hashing. Once an entry is persisted, the cont
 
 Chronicle ships five opt-in resolvers. None are enabled by default.
 
-| Resolver | Context key | What it attaches |
-|----------|-------------|------------------|
-| `EnvironmentContextResolver` | `environment` | `name` (app env), `debug` (bool) |
-| `RequestContextResolver` | `request` | `ip_address`, `user_agent`, `url`, `method`, `request_id` |
-| `HostContextResolver` | `host` | `hostname` |
-| `ProcessContextResolver` | `process` | `id` (PID), `runtime`, `version` (PHP version) |
-| `QueueContextResolver` | `queue` | `job_id`, `connection`, `queue` |
+| Resolver                     | Context key   | What it attaches                                          |
+|------------------------------|---------------|-----------------------------------------------------------|
+| `EnvironmentContextResolver` | `environment` | `name` (app env), `debug` (bool)                          |
+| `RequestContextResolver`     | `request`     | `ip_address`, `user_agent`, `url`, `method`, `request_id` |
+| `HostContextResolver`        | `host`        | `hostname`                                                |
+| `ProcessContextResolver`     | `process`     | `id` (PID), `runtime`, `version` (PHP version)            |
+| `QueueContextResolver`       | `queue`       | `job_id`, `connection`, `queue`                           |
 
 ### EnvironmentContextResolver
 
@@ -73,7 +73,7 @@ Attaches HTTP request metadata. Skips silently when running in a console or queu
 }
 ```
 
-`request_id` is taken from the `X-Request-ID` header when present. When absent, a UUID is generated on first use and stored in request attributes — so every Chronicle entry created within the same HTTP request shares the same generated ID.
+`request_id` is taken from the `X-Request-ID` header when present. When absent, a UUID is generated on first use and stored in request attributes - so every Chronicle entry created within the same HTTP request shares the same generated ID.
 
 ### HostContextResolver
 
@@ -109,7 +109,7 @@ Attaches queue job metadata. Skips silently when no queue job is active (i.e. in
 }
 ```
 
-`QueueJobContext` is a singleton bound by `ChronicleServiceProvider`. It is populated automatically via `JobProcessing`, `JobProcessed`, `JobFailed`, and `JobExceptionOccurred` event listeners — no changes to your application jobs are required.
+`QueueJobContext` is a singleton bound by `ChronicleServiceProvider`. It is populated automatically via `JobProcessing`, `JobProcessed`, `JobFailed`, and `JobExceptionOccurred` event listeners - no changes to your application jobs are required.
 
 ## Enabling resolvers
 
@@ -122,7 +122,7 @@ All built-in resolvers are commented out in `config/chronicle.php`. Uncomment an
     SubjectValidator::class,
     // ...
 
-    // Optional context resolvers — uncomment to enable:
+    // Optional context resolvers - uncomment to enable:
     \Chronicle\Context\EnvironmentContextResolver::class,
     \Chronicle\Context\RequestContextResolver::class,
     \Chronicle\Context\HostContextResolver::class,
@@ -167,7 +167,7 @@ final class TenantContextResolver extends AbstractContextResolver
         $tenant = $this->tenants->current();
 
         if ($tenant === null) {
-            return null; // skips silently — nothing added to context
+            return null; // skips silently - nothing added to context
         }
 
         return [
@@ -207,7 +207,7 @@ When `resolve()` returns an array, the entry's `context` attribute is updated:
 }
 ```
 
-When `resolve()` returns `null`, the entry passes through unmodified. Use this for resolvers that are context-conditional — for example, a resolver that only applies during queue processing, or only when a tenant is active.
+When `resolve()` returns `null`, the entry passes through unmodified. Use this for resolvers that are context-conditional - for example, a resolver that only applies during queue processing, or only when a tenant is active.
 
 ### Resolver contract
 
@@ -234,7 +234,7 @@ abstract class AbstractContextResolver implements EntryExtension, ContextResolve
 
 ### Overwriting an existing key
 
-If your resolver's `contextKey()` matches an existing key in the entry's `context`, the resolver's data replaces it. Resolvers do not merge recursively into existing keys — the entire key is replaced.
+If your resolver's `contextKey()` matches an existing key in the entry's `context`, the resolver's data replaces it. Resolvers do not merge recursively into existing keys - the entire key is replaced.
 
 This means application code can still set `context` values before the extension pipeline runs. If a resolver uses the same key, it wins. Design your key names to avoid collisions (`tenant`, `environment`, `request`, etc. are good choices).
 
@@ -250,13 +250,13 @@ For most applications, ordering between context resolvers does not matter since 
 
 ## Interaction with payload size validation
 
-`PayloadSizeValidator` measures the combined JSON size of `metadata`, `context`, and `diff`. Because it runs in the `VALIDATE` stage — before context resolvers execute — it measures the `context` as it was when the entry was created, not after resolvers have enriched it.
+`PayloadSizeValidator` measures the combined JSON size of `metadata`, `context`, and `diff`. Because it runs in the `VALIDATE` stage - before context resolvers execute - it measures the `context` as it was when the entry was created, not after resolvers have enriched it.
 
-If your resolvers attach large amounts of context data and you want to guard against the total size, consider implementing a custom `PayloadSizeValidator`-style extension in the `PROCESS` stage, after your resolvers have run.
+If your resolvers attach large amounts of context data, and you want to guard against the total size, consider implementing a custom `PayloadSizeValidator`-style extension in the `PROCESS` stage, after your resolvers have run.
 
 ## When not to use context resolvers
 
-Context resolvers are designed for **cross-cutting ambient state** — information that is true about the runtime environment, not about the domain event being logged.
+Context resolvers are designed for **cross-cutting ambient state** - information that is true about the runtime environment, not about the domain event being logged.
 
 Avoid using them for:
 
