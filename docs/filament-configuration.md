@@ -19,6 +19,7 @@ The plugin reads `config/chronicle-filament.php`; every value can be overridden 
 | `verification.store.connection`        | `null`                   | Database connection for the verification result store (`null` = the app default)                                                                                       |
 | `anchoring.enabled`                    | `null`                   | Master toggle for the anchor surfaces. `null` follows core's `chronicle.anchoring.enabled`; set `true`/`false` to force. Hidden everywhere when core anchoring is off. |
 | `anchoring.verify_all_queue_threshold` | `1000`                   | "Verify all anchors" runs synchronously at or below this many in-scope checkpoints, and is queued above it.                                                            |
+| `signing_keys.enabled`                 | `true`                   | Master toggle for the signing-key column, filter, detail badge, and key-ring widget.                                                                                   |
 
 ## Fluent plugin methods
 
@@ -32,6 +33,7 @@ ChronicleFilamentPlugin::make()
     ->cluster(AuditCluster::class)
     ->verification(true)
     ->anchoring(true)
+    ->signingKeys(true)
     ->authorize(fn (): bool => auth()->user()?->can('verify-chronicle') ?? false)
     ->labelResolver(fn (string $type, string $id): ?string => null);
 ```
@@ -41,6 +43,7 @@ ChronicleFilamentPlugin::make()
 | `navigationGroup()`, `navigationSort()`, `slug()`, `cluster()` | Resource placement in the panel                                                                |
 | `verification(bool)`                                           | Enable/disable verification UI                                                                 |
 | `anchoring(bool)`                                              | Show/hide the anchor surfaces (defaults to following core)                                     |
+| `signingKeys(bool)`                                            | Show/hide the signing-key surfaces (column, filter, detail badge, widget)                      |
 | `authorize(Closure)`                                           | Gate the verify actions independently of read access                                           |
 | `labelResolver(Closure)`                                       | Override actor/subject display labels; return `null` to fall back to core's `resolveReference` |
 
