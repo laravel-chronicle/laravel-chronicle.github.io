@@ -57,6 +57,22 @@ An **Anchor** badge column and matching filter read the checkpoint's stored anch
 
 To populate any of this, core anchoring must be configured - RFC 3161 TSA or the [S3 Object Lock adapter](./anchor-s3.md). With none configured, every entry shows as *Unanchored* and the surfaces stay hidden.
 
+## Signing-key visibility
+
+Since the plugin's v1.2, the panel surfaces signing-key rotation - which key signed each entry, drawn from its [checkpoint](./checkpoints.md). This is **display-only**: signature verification already happens inside chain/entry verification (the verifiers resolve each checkpoint's key through core's `KeyRing`), so these surfaces read key metadata only and never sign or verify. Toggle them with `->signingKeys(true|false)` (default on).
+
+The entry table gains a **Signing key** column - the entry's `checkpoint.key_id` as a state-coloured badge with the algorithm, and an *Unsigned* placeholder when the entry has no checkpoint. A matching filter lists the configured keys (labelled `algorithm:keyId`, the active one marked `(active)`) and narrows by key. The column reads the already eager-loaded checkpoint, so there's no per-row query.
+
+Each key reads as one of three states:
+
+| State    | Meaning                                                                        |
+|----------|--------------------------------------------------------------------------------|
+| Active   | Signed by the key core is currently signing new checkpoints with               |
+| Retired  | Signed by an earlier key - still kept in the ring to verify historical entries |
+| Unsigned | The entry has no checkpoint yet                                                |
+
+The entry detail view badges the same Active/Retired state beside the key id (with a note that retired keys still verify historical artifacts), and a `SigningKeyRingWidget` on the list page summarises the ring: the active key, its size, the number of retired keys, and the active key's checkpoint coverage. See core's [Signing & Keys](./signing-and-keys.md) and [key rotation](./signing-and-keys.md#key-rotation) for how the ring is configured and rotated.
+
 ## Theming
 
 The panel uses Filament's native CSS variables and utility classes only - no npm, no asset compilation, no required custom theme. It adopts your panel's primary color and dark mode automatically.
@@ -68,3 +84,4 @@ The panel uses Filament's native CSS variables and utility classes only - no npm
 - [Scalable Verification](./scalable-verification.md) - the verification modes the actions map to
 - [External Anchoring](./anchoring.md) - the anchors the panel surfaces
 - [S3 Object Lock Adapter](./anchor-s3.md) - one way to produce anchors
+- [Signing & Keys](./signing-and-keys.md) - the key ring the panel surfaces, and key rotation
