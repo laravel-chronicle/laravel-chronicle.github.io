@@ -20,6 +20,9 @@ The plugin reads `config/chronicle-filament.php`; every value can be overridden 
 | `anchoring.enabled`                    | `null`                   | Master toggle for the anchor surfaces. `null` follows core's `chronicle.anchoring.enabled`; set `true`/`false` to force. Hidden everywhere when core anchoring is off. |
 | `anchoring.verify_all_queue_threshold` | `1000`                   | "Verify all anchors" runs synchronously at or below this many in-scope checkpoints, and is queued above it.                                                            |
 | `signing_keys.enabled`                 | `true`                   | Master toggle for the signing-key column, filter, detail badge, and key-ring widget.                                                                                   |
+| `crypto_shredding.enabled`             | `null`                   | Toggle for the read-only erasure surfaces (column, filter, detail, proof preset, widget). `null` follows core's `chronicle.encryption.enabled`.                        |
+| `erasure.enabled`                      | `false`                  | Master toggle for the irreversible Erase-subject action. Off by default.                                                                                               |
+| `erasure.allow_hold_override`          | `false`                  | Whether a legal hold may be overridden during erasure (still gated per action).                                                                                        |
 
 ## Fluent plugin methods
 
@@ -34,6 +37,9 @@ ChronicleFilamentPlugin::make()
     ->verification(true)
     ->anchoring(true)
     ->signingKeys(true)
+    ->cryptoShredding(true)
+    ->erasure(false) // the erase action is off by default
+    ->eraseAuthorize(fn ($record): bool => auth()->user()?->can('erase-subject') ?? false)
     ->authorize(fn (): bool => auth()->user()?->can('verify-chronicle') ?? false)
     ->labelResolver(fn (string $type, string $id): ?string => null);
 ```
@@ -44,6 +50,10 @@ ChronicleFilamentPlugin::make()
 | `verification(bool)`                                           | Enable/disable verification UI                                                                 |
 | `anchoring(bool)`                                              | Show/hide the anchor surfaces (defaults to following core)                                     |
 | `signingKeys(bool)`                                            | Show/hide the signing-key surfaces (column, filter, detail badge, widget)                      |
+| `cryptoShredding(bool)`                                        | Show/hide the read-only erasure surfaces (defaults to following core)                          |
+| `erasure(bool)`                                                | Enable the Erase-subject action (default off)                                                  |
+| `eraseAuthorize(Closure)`                                      | Authorize the erase action; **defaults to deny**, separate from the verify gate                |
+| `eraseAllowHoldOverride(bool)`                                 | Permit overriding a legal hold during erasure (default off)                                    |
 | `authorize(Closure)`                                           | Gate the verify actions independently of read access                                           |
 | `labelResolver(Closure)`                                       | Override actor/subject display labels; return `null` to fall back to core's `resolveReference` |
 

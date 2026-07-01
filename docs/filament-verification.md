@@ -73,6 +73,33 @@ Each key reads as one of three states:
 
 The entry detail view badges the same Active/Retired state beside the key id (with a note that retired keys still verify historical artifacts), and a `SigningKeyRingWidget` on the list page summarises the ring: the active key, its size, the number of retired keys, and the active key's checkpoint coverage. See core's [Signing & Keys](./signing-and-keys.md) and [key rotation](./signing-and-keys.md#key-rotation) for how the ring is configured and rotated.
 
+## Crypto-shredding & GDPR erasure
+
+Since the plugin's v1.3, the panel surfaces core's [crypto-shredding](./crypto-shredding.md) state and can action a [GDPR erasure](./gdpr-erasure.md). These surfaces appear only when core encryption is configured; toggle the read-only surfaces with `->cryptoShredding()` (defaults to following core).
+
+The **read-only surfaces** never unwrap a DEK or decrypt anything - they read the subject key's status only:
+
+- An **Erasure** column (Encrypted / Erased / Not encrypted, with an *On hold* indicator) and filters by erasure state and legal hold. State is primed once per page, so the column stays query-flat with no per-row lookup.
+- A **Subject erasure** detail section - state, wrapping `kek_id`, `erased_at`, and active legal-hold status. An erased subject is shown as permanently unreadable *while its entry stays intact and still verifies*.
+- An **Erasure proofs only** preset filtering to the `subject.erased` proof entries, with requester and reason.
+- A `CryptoShreddingWidget` summarising encrypted / erased / on-hold subjects and the active KEK.
+
+### The erase action
+
+The panel's **only write** is an opt-in *Erase subject (GDPR Article 17)* action calling core's `Chronicle::eraseSubject()`. It does not mutate the ledger - core destroys the subject's DEK and **appends** a hash-chained `subject.erased` proof, leaving every existing entry (and its hash and signature) unchanged and still verifiable.
+
+It is fenced deliberately, and each guard is enforced in the action's visibility and re-checked at execution:
+
+| Guard                 | Behaviour                                                                                  |
+|-----------------------|--------------------------------------------------------------------------------------------|
+| Off by default        | Absent unless `->erasure(true)` (config default `false`)                                   |
+| Authorized separately | `->eraseAuthorize()` **defaults to deny**; never the verify gate                           |
+| Confirmation          | Type the exact `subject_type:subject_id` + a mandatory reason                              |
+| Legal hold            | Blocks by default; overridable only via `->eraseAllowHoldOverride()` + a distinct checkbox |
+| Idempotent            | Re-erasing an already-shredded subject is a no-op                                          |
+
+Enabling requires **both** `->erasure(true)` and an `->eraseAuthorize()` closure that grants - the config flag alone never makes it reachable. See core's [GDPR erasure](./gdpr-erasure.md) and [crypto-shredding](./crypto-shredding.md) for what erasure does to the key store and the audit trail.
+
 ## Theming
 
 The panel uses Filament's native CSS variables and utility classes only - no npm, no asset compilation, no required custom theme. It adopts your panel's primary color and dark mode automatically.
@@ -85,3 +112,5 @@ The panel uses Filament's native CSS variables and utility classes only - no npm
 - [External Anchoring](./anchoring.md) - the anchors the panel surfaces
 - [S3 Object Lock Adapter](./anchor-s3.md) - one way to produce anchors
 - [Signing & Keys](./signing-and-keys.md) - the key ring the panel surfaces, and key rotation
+- [Crypto-Shredding](./crypto-shredding.md) - the erasure state the panel surfaces
+- [GDPR Erasure](./gdpr-erasure.md) - what the Erase-subject action performs
